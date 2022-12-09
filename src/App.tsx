@@ -2,7 +2,8 @@ import React, {
 	useState,
 	useLayoutEffect,
 	useRef,
-	MutableRefObject
+	MutableRefObject,
+	Dispatch
 } from 'react';
 
 import { BsArrowUpCircle, BsArrowDownCircle } from 'react-icons/bs';
@@ -30,17 +31,15 @@ interface timeControlType {
 	name: string;
 	length: number;
 }
-type setSessionLengthType = React.Dispatch<
-	React.SetStateAction<timeControlType>
->;
+type setSessionLengthType = Dispatch<React.SetStateAction<timeControlType>>;
 
 type TimeControlPropsType = {
 	timeControlObj: timeControlType;
 	setState: setSessionLengthType;
 	currAction: string;
 	startStopState: string;
-	setTimerMinutes: React.Dispatch<React.SetStateAction<number>>;
-	setTimerSeconds: React.Dispatch<React.SetStateAction<number>>;
+	setTimerMinutes: Dispatch<React.SetStateAction<number>>;
+	setTimerSeconds: Dispatch<React.SetStateAction<number>>;
 };
 
 const TimeControl: React.FC<TimeControlPropsType> = (
