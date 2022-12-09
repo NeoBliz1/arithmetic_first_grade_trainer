@@ -1,0 +1,8 @@
+{
+	"short_name": "Neobliz1 25+5 clock project",
+	"name": "Neobliz1's freeCodeCamp project '25+5 clock'",
+	"start_url": ".",
+	"display": "standalone",
+	"theme_color": "#000000",
+	"background_color": "#ffffff"
+}
