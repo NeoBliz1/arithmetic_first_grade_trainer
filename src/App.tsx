@@ -1,5 +1,10 @@
+import React, {
+	useState,
+	useLayoutEffect,
+	useRef,
+	MutableRefObject
+} from 'react';
 
-import React, { useState, useLayoutEffect, useRef } from 'react';
 import { BsArrowUpCircle, BsArrowDownCircle } from 'react-icons/bs';
 import { AiOutlinePlayCircle, AiOutlinePauseCircle } from 'react-icons/ai';
 import { FiRefreshCcw } from 'react-icons/fi';
@@ -72,7 +77,7 @@ const TimeControl: React.FC<TimeControlPropsType> = (
 	};
 	const increaseLength: () => void = () => {
 		if (startStopState === 'stop') {
-			setState((prevState: timeControlType, aO: string) =>
+			setState((prevState: timeControlType) =>
 				refreshActionLength(prevState, 'increase')
 			);
 		}
@@ -136,7 +141,8 @@ const App: React.FC = () => {
 	const [timerSeconds, setTimerSeconds] = useState<number>(0);
 	const [currAction, setCurrAction] = useState<string>('Session');
 	const [startStopState, setStartStopState] = useState<string>('stop');
-	const audioHtmlEl = useRef<HTMLAudioElement>();
+	const audioHtmlEl = useRef() as MutableRefObject<HTMLAudioElement>;
+	const currAudioHtmlEL = audioHtmlEl.current;
 
 	const toggleCurrAction: (prevState: string) => string = (prevState) => {
 		setTimerSeconds(0);
@@ -151,7 +157,7 @@ const App: React.FC = () => {
 
 	const minutesContdown: (prevState: number) => number = (prevState) => {
 		if (prevState - 1 < 0) {
-			audioHtmlEl.current.play();
+			currAudioHtmlEL.play();
 			setCurrAction((prevState) => toggleCurrAction(prevState));
 			return 0;
 		} else return prevState - 1;
@@ -185,8 +191,8 @@ const App: React.FC = () => {
 	};
 
 	const refreshHandler: () => void = () => {
-		audioHtmlEl.current.pause();
-		audioHtmlEl.current.load();
+		currAudioHtmlEL.pause();
+		currAudioHtmlEL.load();
 		setStartStopState('stop');
 		clearInterval(timerInterval);
 		setCurrAction('Session');
