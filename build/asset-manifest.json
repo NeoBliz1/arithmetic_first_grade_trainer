@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/twenty_five_plus_five_clock/static/css/main.da43731f.css",
+    "main.js": "/twenty_five_plus_five_clock/static/js/main.1120016d.js",
+    "index.html": "/twenty_five_plus_five_clock/index.html",
+    "main.da43731f.css.map": "/twenty_five_plus_five_clock/static/css/main.da43731f.css.map",
+    "main.1120016d.js.map": "/twenty_five_plus_five_clock/static/js/main.1120016d.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.da43731f.css",
+    "static/js/main.1120016d.js"
+  ]
+}
