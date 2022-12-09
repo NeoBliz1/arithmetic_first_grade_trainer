@@ -2,7 +2,11 @@ import React, {
 	useState,
 	useLayoutEffect,
 	useRef,
-	MutableRefObject
+	//import react types
+	MutableRefObject,
+	Dispatch,
+	SetStateAction,
+	FC
 } from 'react';
 
 import { BsArrowUpCircle, BsArrowDownCircle } from 'react-icons/bs';
@@ -30,22 +34,18 @@ interface timeControlType {
 	name: string;
 	length: number;
 }
-type setSessionLengthType = React.Dispatch<
-	React.SetStateAction<timeControlType>
->;
+type setSessionLengthType = Dispatch<SetStateAction<timeControlType>>;
 
 type TimeControlPropsType = {
 	timeControlObj: timeControlType;
 	setState: setSessionLengthType;
 	currAction: string;
 	startStopState: string;
-	setTimerMinutes: React.Dispatch<React.SetStateAction<number>>;
-	setTimerSeconds: React.Dispatch<React.SetStateAction<number>>;
+	setTimerMinutes: Dispatch<SetStateAction<number>>;
+	setTimerSeconds: Dispatch<SetStateAction<number>>;
 };
 
-const TimeControl: React.FC<TimeControlPropsType> = (
-	props: TimeControlPropsType
-) => {
+const TimeControl: FC<TimeControlPropsType> = (props: TimeControlPropsType) => {
 	const {
 		timeControlObj,
 		setState,
@@ -125,7 +125,7 @@ const TimeControl: React.FC<TimeControlPropsType> = (
 };
 
 let timerInterval: ReturnType<typeof setInterval>;
-const App: React.FC = () => {
+const App: FC = () => {
 	const [bgColor, setBgColor] = useState<string>('gray');
 	const [breakLength, setBrakeLength] = useState<timeControlType>({
 		id: 'break',
