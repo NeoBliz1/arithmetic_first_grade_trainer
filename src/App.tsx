@@ -127,7 +127,7 @@ const EquiationControl: FC<TimeControlPropsType> = (
 							onClick={decreaseLength}>
 							<BsArrowDownCircle />
 						</button>
-						<h4 className="ms-2">до</h4>
+						<h4 className="ms-2">до!</h4>
 						<button
 							id={timeControlObj.id + '-increment'}
 							className={
