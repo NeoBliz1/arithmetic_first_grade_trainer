@@ -6,7 +6,7 @@ import React, {
 	MutableRefObject,
 	Dispatch,
 	SetStateAction,
-	FC
+	FC,
 } from 'react';
 
 import { BsArrowUpCircle, BsArrowDownCircle } from 'react-icons/bs';
@@ -26,7 +26,7 @@ const colorArray = [
 	'#26c6da',
 	'#9ccc65',
 	'#d3b21d',
-	'#ffb74d'
+	'#ffb74d',
 ];
 
 interface timeControlType {
@@ -45,18 +45,20 @@ type TimeControlPropsType = {
 	setTimerSeconds: Dispatch<SetStateAction<number>>;
 };
 
-const TimeControl: FC<TimeControlPropsType> = (props: TimeControlPropsType) => {
+const EquiationControl: FC<TimeControlPropsType> = (
+	props: TimeControlPropsType,
+) => {
 	const {
 		timeControlObj,
 		setState,
 		currAction,
 		startStopState,
 		setTimerMinutes,
-		setTimerSeconds
+		setTimerSeconds,
 	} = props;
 	const refreshActionLength: (
 		prevState: timeControlType,
-		arithmeticOperation: string
+		arithmeticOperation: string,
 	) => timeControlType = (prevState, arithmeticOperation) => {
 		let newlengthState: number;
 		if (arithmeticOperation === 'increase') {
@@ -72,13 +74,13 @@ const TimeControl: FC<TimeControlPropsType> = (props: TimeControlPropsType) => {
 		return {
 			id: prevState.id,
 			name: prevState.name,
-			length: newlengthState
+			length: newlengthState,
 		};
 	};
 	const increaseLength: () => void = () => {
 		if (startStopState === 'stop') {
 			setState((prevState: timeControlType) =>
-				refreshActionLength(prevState, 'increase')
+				refreshActionLength(prevState, 'increase'),
 			);
 		}
 	};
@@ -86,7 +88,7 @@ const TimeControl: FC<TimeControlPropsType> = (props: TimeControlPropsType) => {
 	const decreaseLength: () => void = () => {
 		if (startStopState === 'stop') {
 			setState((prevState: timeControlType) =>
-				refreshActionLength(prevState, 'decrease')
+				refreshActionLength(prevState, 'decrease'),
 			);
 		}
 	};
@@ -95,30 +97,82 @@ const TimeControl: FC<TimeControlPropsType> = (props: TimeControlPropsType) => {
 			id={timeControlObj.name}
 			className="d-flex flex-column align-items-center mx-3">
 			<h3 id={timeControlObj.id + '-label'} className="text-center">
-				{timeControlObj.name} Length
+				Выберите опции
 			</h3>
 			<div className="d-flex flex-row bd-highlight mb-3">
-				<button
-					id={timeControlObj.id + '-increment'}
-					className={
-						(startStopState === 'stop'
-							? 'buttonClickAnimation '
-							: 'buttonDisableStyle ') + 'timerButton hoverAnimationDuration'
-					}
-					onClick={increaseLength}>
-					<BsArrowUpCircle />
-				</button>
-				<h2 id={timeControlObj.id + '-length'}>{timeControlObj.length}</h2>
-				<button
-					id={timeControlObj.id + '-decrement'}
-					className={
-						(startStopState === 'stop'
-							? 'buttonClickAnimation '
-							: 'buttonDisableStyle ') + 'timerButton hoverAnimationDuration'
-					}
-					onClick={decreaseLength}>
-					<BsArrowDownCircle />
-				</button>
+				<div className="d-flex flex-column align-items-center mx-3">
+					<h4>Диапазон чисел:</h4>
+					<div className="d-flex flex-row align-items-center bd-highlight mb-3">
+						<h4>От</h4>
+						<button
+							id={timeControlObj.id + '-increment'}
+							className={
+								(startStopState === 'stop'
+									? 'buttonClickAnimation '
+									: 'buttonDisableStyle ') +
+								'timerButton hoverAnimationDuration'
+							}
+							onClick={increaseLength}>
+							<BsArrowUpCircle />
+						</button>
+						<h2 id={timeControlObj.id + '-length'}>{timeControlObj.length}</h2>
+						<button
+							id={timeControlObj.id + '-decrement'}
+							className={
+								(startStopState === 'stop'
+									? 'buttonClickAnimation '
+									: 'buttonDisableStyle ') +
+								'timerButton hoverAnimationDuration'
+							}
+							onClick={decreaseLength}>
+							<BsArrowDownCircle />
+						</button>
+						<h4 className="ms-2">до</h4>
+						<button
+							id={timeControlObj.id + '-increment'}
+							className={
+								(startStopState === 'stop'
+									? 'buttonClickAnimation '
+									: 'buttonDisableStyle ') +
+								'timerButton hoverAnimationDuration'
+							}
+							onClick={increaseLength}>
+							<BsArrowUpCircle />
+						</button>
+						<h2 id={timeControlObj.id + '-length'}>{timeControlObj.length}</h2>
+						<button
+							id={timeControlObj.id + '-decrement'}
+							className={
+								(startStopState === 'stop'
+									? 'buttonClickAnimation '
+									: 'buttonDisableStyle ') +
+								'timerButton hoverAnimationDuration'
+							}
+							onClick={decreaseLength}>
+							<BsArrowDownCircle />
+						</button>
+					</div>
+				</div>
+				<div>
+					<h4>Доступные действия:</h4>
+					<div className="d-flex flex-row bd-highlight m-2">
+						<label className="h4" htmlFor="adding">
+							Сложение (+)
+						</label>
+						<input className="m-2" type="checkbox" id="adding" name="adding" />
+					</div>
+					<div className="d-flex flex-row bd-highlight m-2">
+						<label className="h4" htmlFor="subtracting">
+							Вычитание (-)
+						</label>
+						<input
+							className="m-2"
+							type="checkbox"
+							id="subtracting"
+							name="subtracting"
+						/>
+					</div>
+				</div>
 			</div>
 		</div>
 	);
@@ -130,12 +184,12 @@ const App: FC = () => {
 	const [breakLength, setBrakeLength] = useState<timeControlType>({
 		id: 'break',
 		name: 'Break',
-		length: 5
+		length: 5,
 	});
 	const [sessionLength, setSessionLength] = useState<timeControlType>({
 		id: 'session',
 		name: 'Session',
-		length: 25
+		length: 25,
 	});
 	const [timerMinutes, setTimerMinutes] = useState<number>(25);
 	const [timerSeconds, setTimerSeconds] = useState<number>(0);
@@ -199,12 +253,12 @@ const App: FC = () => {
 		setSessionLength((prevState: timeControlType) => ({
 			id: prevState.id,
 			name: prevState.name,
-			length: 25
+			length: 25,
 		}));
 		setBrakeLength((prevState: timeControlType) => ({
 			id: prevState.id,
 			name: prevState.name,
-			length: 5
+			length: 5,
 		}));
 		setTimerMinutes(25);
 		setTimerSeconds(0);
@@ -214,28 +268,23 @@ const App: FC = () => {
 		setBgColor(colorArray[Math.floor(Math.random() * 10)]);
 	}, []);
 	return (
-		<div
+		<main
 			id="container"
 			className="vh-100 d-flex justify-content-center align-items-center elementFadeIn"
 			style={{ backgroundColor: bgColor }}>
 			<div
 				id="app"
 				className="d-flex flex-column align-items-center appContainer">
-				<h2 id="mainTitle" style={{ width: 'max-content' }}>
-					25 + 5 Clock
+				<h2 id="firstLineTitle" style={{ width: 'max-content' }}>
+					Тренажёр арифметики.
+				</h2>
+				<h2 id="seconLineTitle" style={{ width: 'max-content' }}>
+					Первый класс.
 				</h2>
 				<div id="controlBlock" className="d-flex">
-					<TimeControl
+					<EquiationControl
 						timeControlObj={breakLength}
 						setState={setBrakeLength}
-						currAction={currAction}
-						startStopState={startStopState}
-						setTimerMinutes={setTimerMinutes}
-						setTimerSeconds={setTimerSeconds}
-					/>
-					<TimeControl
-						timeControlObj={sessionLength}
-						setState={setSessionLength}
 						currAction={currAction}
 						startStopState={startStopState}
 						setTimerMinutes={setTimerMinutes}
@@ -273,7 +322,7 @@ const App: FC = () => {
 					src="https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"
 				/>
 			</div>
-		</div>
+		</main>
 	);
 };
 
