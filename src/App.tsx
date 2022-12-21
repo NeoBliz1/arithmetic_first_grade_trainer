@@ -97,7 +97,7 @@ const EquiationControl: FC<TimeControlPropsType> = (
 			id={timeControlObj.name}
 			className="d-flex flex-column align-items-center mx-3">
 			<h3 id={timeControlObj.id + '-label'} className="text-center">
-				Выберите опции
+				Выберите опции !!
 			</h3>
 			<div className="d-flex flex-row bd-highlight mb-3">
 				<div className="d-flex flex-column align-items-center mx-3">
