@@ -1,5 +1,3 @@
-@import url('https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css');
-
 .elementFadeIn {
 	-webkit-animation: fadeIn 2s ease-in-out;
 	animation: fadeIn 2s ease-in-out;

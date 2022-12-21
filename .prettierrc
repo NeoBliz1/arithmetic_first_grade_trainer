@@ -4,9 +4,9 @@
   "useTabs": true,
   "semi": true,
   "singleQuote": true,
-  "trailingComma": "none",
+  "trailingComma": "all",
   "bracketSpacing": true,
   "jsxBracketSameLine": true,
-  "fluid": false,
+  "fluid": true,
   "arrowParens": "always"
 }
