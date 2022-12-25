@@ -6,11 +6,20 @@ import React, {
 	MutableRefObject,
 	Dispatch,
 	SetStateAction,
-	FC,
+	ChangeEvent,
 } from 'react';
 
-import { BsArrowUpCircle, BsArrowDownCircle } from 'react-icons/bs';
-import { AiOutlinePlayCircle, AiOutlinePauseCircle } from 'react-icons/ai';
+import {
+	BsArrowUpCircle,
+	BsArrowDownCircle,
+	BsCloudMinusFill,
+	BsColumnsGap,
+} from 'react-icons/bs';
+import {
+	AiOutlinePlayCircle,
+	AiOutlinePauseCircle,
+	AiFillAccountBook,
+} from 'react-icons/ai';
 import { FiRefreshCcw } from 'react-icons/fi';
 
 import './styles.css';
@@ -29,126 +38,151 @@ const colorArray = [
 	'#ffb74d',
 ];
 
-interface timeControlType {
-	id?: string;
-	name: string;
-	length: number;
+interface EquationPropType {
+	minEquationDigit: number;
+	maxEquationDigit: number;
+	adding: boolean;
+	subtracting: boolean;
 }
-type setSessionLengthType = Dispatch<SetStateAction<timeControlType>>;
+type setEquationPropsType = Dispatch<SetStateAction<EquationPropType>>;
 
-type TimeControlPropsType = {
-	timeControlObj: timeControlType;
-	setState: setSessionLengthType;
+type equationControlSettingsType = {
+	equiationPropsObj: EquationPropType;
+	setEquiationPropsObj: setEquationPropsType;
 	currAction: string;
 	startStopState: string;
 	setTimerMinutes: Dispatch<SetStateAction<number>>;
 	setTimerSeconds: Dispatch<SetStateAction<number>>;
 };
 
-const EquiationControl: FC<TimeControlPropsType> = (
-	props: TimeControlPropsType,
-) => {
+//control component
+const EquiationControl = (props: equationControlSettingsType): JSX.Element => {
 	const {
-		timeControlObj,
-		setState,
+		equiationPropsObj,
+		setEquiationPropsObj,
 		currAction,
 		startStopState,
 		setTimerMinutes,
 		setTimerSeconds,
 	} = props;
-	const refreshActionLength: (
-		prevState: timeControlType,
-		arithmeticOperation: string,
-	) => timeControlType = (prevState, arithmeticOperation) => {
-		let newlengthState: number;
-		if (arithmeticOperation === 'increase') {
-			newlengthState = prevState.length === 60 ? 60 : prevState.length + 1;
-		} else {
-			newlengthState = prevState.length === 1 ? 1 : prevState.length - 1;
-		}
 
-		if (prevState.name === currAction) {
-			setTimerMinutes(newlengthState);
-			setTimerSeconds(0);
-		}
-		return {
-			id: prevState.id,
-			name: prevState.name,
-			length: newlengthState,
-		};
-	};
-	const increaseLength: () => void = () => {
+	const increaseMinDigit: () => void = () => {
 		if (startStopState === 'stop') {
-			setState((prevState: timeControlType) =>
-				refreshActionLength(prevState, 'increase'),
-			);
+			setEquiationPropsObj((prevState: EquationPropType) => ({
+				//other states in obj stay the same
+				...prevState,
+				minEquationDigit: prevState.minEquationDigit + 1,
+			}));
 		}
+	};
+	const decreaseMinDigit: () => void = () => {
+		if (startStopState === 'stop') {
+			setEquiationPropsObj((prevState: EquationPropType) => ({
+				//other states in obj stay the same
+				...prevState,
+				minEquationDigit: prevState.minEquationDigit - 1,
+			}));
+		}
+	};
+	const increaseMaxDigit: () => void = () => {
+		if (startStopState === 'stop') {
+			setEquiationPropsObj((prevState: EquationPropType) => ({
+				//other states in obj stay the same
+				...prevState,
+				maxEquationDigit: prevState.maxEquationDigit + 1,
+			}));
+		}
+	};
+	const decreaseMaxDigit: () => void = () => {
+		if (startStopState === 'stop') {
+			setEquiationPropsObj((prevState: EquationPropType) => ({
+				//other states in obj stay the same
+				...prevState,
+				maxEquationDigit: prevState.maxEquationDigit - 1,
+			}));
+		}
+	};
+	const typeMinDigitHandler: (
+		event: ChangeEvent<HTMLInputElement>,
+	) => void = () => {
+		if (startStopState === 'stop') {
+			if (event) {
+				const target = event.target as HTMLInputElement;
+				if (typeof target.value === 'string') {
+					setEquiationPropsObj((prevState: EquationPropType) => ({
+						//other states in obj stay the same
+						...prevState,
+						minEquationDigit: isNaN(parseInt(target.value))
+							? prevState.minEquationDigit
+							: parseInt(target.value),
+					}));
+				}
+			}
+		}
+		// console.log(event?.target);
 	};
 
-	const decreaseLength: () => void = () => {
-		if (startStopState === 'stop') {
-			setState((prevState: timeControlType) =>
-				refreshActionLength(prevState, 'decrease'),
-			);
-		}
-	};
 	return (
-		<div
-			id={timeControlObj.name}
-			className="d-flex flex-column align-items-center mx-3">
-			<h3 id={timeControlObj.id + '-label'} className="text-center">
-				Выберите опции !!
-			</h3>
+		<div className="d-flex flex-column align-items-center mx-3">
+			<h3 className="text-center">Выберите опции</h3>
 			<div className="d-flex flex-row bd-highlight mb-3">
 				<div className="d-flex flex-column align-items-center mx-3">
-					<h4>Диапазон чисел:</h4>
+					<h4>Диапазон чиселs:</h4>
 					<div className="d-flex flex-row align-items-center bd-highlight mb-3">
 						<h4>От</h4>
 						<button
-							id={timeControlObj.id + '-increment'}
+							id="minDigitIncrement"
 							className={
 								(startStopState === 'stop'
 									? 'buttonClickAnimation '
 									: 'buttonDisableStyle ') +
 								'timerButton hoverAnimationDuration'
 							}
-							onClick={increaseLength}>
+							onClick={increaseMinDigit}>
 							<BsArrowUpCircle />
 						</button>
-						<h2 id={timeControlObj.id + '-length'}>{timeControlObj.length}</h2>
+						<h2 id="minDigit">{equiationPropsObj.minEquationDigit}</h2>
+						<input
+							type="text"
+							id="minDigiit"
+							className="form-control"
+							size={1}
+							onChange={(event) => typeMinDigitHandler(event)}
+							value={equiationPropsObj.minEquationDigit}
+						/>
 						<button
-							id={timeControlObj.id + '-decrement'}
+							id="minDigitDecrement"
 							className={
 								(startStopState === 'stop'
 									? 'buttonClickAnimation '
 									: 'buttonDisableStyle ') +
 								'timerButton hoverAnimationDuration'
 							}
-							onClick={decreaseLength}>
+							onClick={decreaseMinDigit}>
 							<BsArrowDownCircle />
 						</button>
-						<h4 className="ms-2">до!</h4>
+						<h4 className="ms-2">до</h4>
 						<button
-							id={timeControlObj.id + '-increment'}
+							id="maxDigitIncrement"
 							className={
 								(startStopState === 'stop'
 									? 'buttonClickAnimation '
 									: 'buttonDisableStyle ') +
 								'timerButton hoverAnimationDuration'
 							}
-							onClick={increaseLength}>
+							onClick={increaseMaxDigit}>
 							<BsArrowUpCircle />
 						</button>
-						<h2 id={timeControlObj.id + '-length'}>{timeControlObj.length}</h2>
+						<h2 id="maxDigit">{equiationPropsObj.maxEquationDigit}</h2>
 						<button
-							id={timeControlObj.id + '-decrement'}
+							id="minDigitDecrement"
 							className={
 								(startStopState === 'stop'
 									? 'buttonClickAnimation '
 									: 'buttonDisableStyle ') +
 								'timerButton hoverAnimationDuration'
 							}
-							onClick={decreaseLength}>
+							onClick={decreaseMaxDigit}>
 							<BsArrowDownCircle />
 						</button>
 					</div>
@@ -179,17 +213,13 @@ const EquiationControl: FC<TimeControlPropsType> = (
 };
 
 let timerInterval: ReturnType<typeof setInterval>;
-const App: FC = () => {
+const App = (): JSX.Element => {
 	const [bgColor, setBgColor] = useState<string>('gray');
-	const [breakLength, setBrakeLength] = useState<timeControlType>({
-		id: 'break',
-		name: 'Break',
-		length: 5,
-	});
-	const [sessionLength, setSessionLength] = useState<timeControlType>({
-		id: 'session',
-		name: 'Session',
-		length: 25,
+	const [equationProps, setEquationProps] = useState<EquationPropType>({
+		minEquationDigit: 0,
+		maxEquationDigit: 10,
+		adding: true,
+		subtracting: true,
 	});
 	const [timerMinutes, setTimerMinutes] = useState<number>(25);
 	const [timerSeconds, setTimerSeconds] = useState<number>(0);
@@ -198,21 +228,21 @@ const App: FC = () => {
 	const audioHtmlEl = useRef() as MutableRefObject<HTMLAudioElement>;
 	const currAudioHtmlEL = audioHtmlEl.current;
 
-	const toggleCurrAction: (prevState: string) => string = (prevState) => {
-		setTimerSeconds(0);
-		if (prevState === 'Session') {
-			setTimerMinutes(breakLength.length);
-			return 'Brake';
-		} else {
-			setTimerMinutes(sessionLength.length);
-			return 'Session';
-		}
-	};
+	// const toggleCurrAction: (prevState: string) => string = (prevState) => {
+	// 	setTimerSeconds(0);
+	// 	if (prevState === 'Session') {
+	// 		setTimerMinutes(breakLength.length);
+	// 		return 'Brake';
+	// 	} else {
+	// 		setTimerMinutes(sessionLength.length);
+	// 		return 'Session';
+	// 	}
+	// };
 
 	const minutesContdown: (prevState: number) => number = (prevState) => {
 		if (prevState - 1 < 0) {
 			currAudioHtmlEL.play();
-			setCurrAction((prevState) => toggleCurrAction(prevState));
+			// setCurrAction((prevState) => toggleCurrAction(prevState));
 			return 0;
 		} else return prevState - 1;
 	};
@@ -250,16 +280,16 @@ const App: FC = () => {
 		setStartStopState('stop');
 		clearInterval(timerInterval);
 		setCurrAction('Session');
-		setSessionLength((prevState: timeControlType) => ({
-			id: prevState.id,
-			name: prevState.name,
-			length: 25,
-		}));
-		setBrakeLength((prevState: timeControlType) => ({
-			id: prevState.id,
-			name: prevState.name,
-			length: 5,
-		}));
+		// setSessionLength((prevState: timeControlType) => ({
+		// 	id: prevState.id,
+		// 	name: prevState.name,
+		// 	length: 25,
+		// }));
+		// setBrakeLength((prevState: timeControlType) => ({
+		// 	id: prevState.id,
+		// 	name: prevState.name,
+		// 	length: 5,
+		// }));
 		setTimerMinutes(25);
 		setTimerSeconds(0);
 	};
@@ -283,8 +313,8 @@ const App: FC = () => {
 				</h2>
 				<div id="controlBlock" className="d-flex">
 					<EquiationControl
-						timeControlObj={breakLength}
-						setState={setBrakeLength}
+						equiationPropsObj={equationProps}
+						setEquiationPropsObj={setEquationProps}
 						currAction={currAction}
 						startStopState={startStopState}
 						setTimerMinutes={setTimerMinutes}
