@@ -1,5 +1,6 @@
 import React, {
 	useState,
+	useEffect,
 	useLayoutEffect,
 	useRef,
 	//import react types
@@ -66,10 +67,20 @@ const EquiationControl = (props: equationControlSettingsType): JSX.Element => {
 		setTimerSeconds,
 	} = props;
 
+	const [minDigitInputWidth, setMinDigitInputWidth] = useState('35px');
+	const [maxDigitInputWidth, setMaxDigitInputWidth] = useState('35px');
+
+	//input width handling depending on the length of the input value
+	type inputHandlerType = (valueLength: number) => string;
+	const inputWidthHandler: inputHandlerType = (valueLength) => {
+		const newNumberInputWidth =
+			40 + (valueLength === 1 ? 0 : 9.67 * valueLength);
+		// console.log(newNumberInputWidth.toString()+'px')
+		return newNumberInputWidth.toString() + 'px';
+	};
 	const increaseMinDigit: () => void = () => {
 		if (startStopState === 'stop') {
 			setEquiationPropsObj((prevState: EquationPropType) => ({
-				//other states in obj stay the same
 				...prevState,
 				minEquationDigit: prevState.minEquationDigit + 1,
 			}));
@@ -78,7 +89,6 @@ const EquiationControl = (props: equationControlSettingsType): JSX.Element => {
 	const decreaseMinDigit: () => void = () => {
 		if (startStopState === 'stop') {
 			setEquiationPropsObj((prevState: EquationPropType) => ({
-				//other states in obj stay the same
 				...prevState,
 				minEquationDigit: prevState.minEquationDigit - 1,
 			}));
@@ -86,22 +96,23 @@ const EquiationControl = (props: equationControlSettingsType): JSX.Element => {
 	};
 	const increaseMaxDigit: () => void = () => {
 		if (startStopState === 'stop') {
-			setEquiationPropsObj((prevState: EquationPropType) => ({
-				//other states in obj stay the same
-				...prevState,
-				maxEquationDigit: prevState.maxEquationDigit + 1,
-			}));
+			if (startStopState === 'stop') {
+				setEquiationPropsObj((prevState: EquationPropType) => ({
+					...prevState,
+					maxEquationDigit: prevState.maxEquationDigit + 1,
+				}));
+			}
 		}
 	};
 	const decreaseMaxDigit: () => void = () => {
 		if (startStopState === 'stop') {
 			setEquiationPropsObj((prevState: EquationPropType) => ({
-				//other states in obj stay the same
 				...prevState,
 				maxEquationDigit: prevState.maxEquationDigit - 1,
 			}));
 		}
 	};
+
 	const typeMinDigitHandler: (
 		event: ChangeEvent<HTMLInputElement>,
 	) => void = () => {
@@ -121,90 +132,200 @@ const EquiationControl = (props: equationControlSettingsType): JSX.Element => {
 		}
 		// console.log(event?.target);
 	};
+	const typeMaxDigitHandler: (
+		event: ChangeEvent<HTMLInputElement>,
+	) => void = () => {
+		if (startStopState === 'stop') {
+			if (event) {
+				const target = event.target as HTMLInputElement;
+				if (typeof target.value === 'string') {
+					setEquiationPropsObj((prevState: EquationPropType) => ({
+						//other states in obj stay the same
+						...prevState,
+						maxEquationDigit: isNaN(parseInt(target.value))
+							? prevState.maxEquationDigit
+							: parseInt(target.value),
+					}));
+				}
+			}
+		}
+		// console.log(event?.target);
+	};
+	const toggleAddingState: () => void = () => {
+		if (startStopState === 'stop') {
+			setEquiationPropsObj((prevState: EquationPropType) => {
+				return prevState.adding
+					? { ...prevState, adding: false }
+					: { ...prevState, adding: true };
+			});
+		}
+	};
+	const toggleSubtractingState: () => void = () => {
+		if (startStopState === 'stop') {
+			setEquiationPropsObj((prevState: EquationPropType) => {
+				return prevState.subtracting
+					? { ...prevState, subtracting: false }
+					: { ...prevState, subtracting: true };
+			});
+		}
+	};
+	//balance bad states
+	useEffect(() => {
+		console.log(equiationPropsObj.adding);
+		console.log(equiationPropsObj.subtracting);
+		if (!equiationPropsObj.adding && !equiationPropsObj.subtracting) {
+			toggleAddingState();
+		}
+		// console.log(equiationPropsObj.minEquationDigit.toString().length)
+		setMinDigitInputWidth(
+			inputWidthHandler(equiationPropsObj.minEquationDigit.toString().length),
+		);
+		setMaxDigitInputWidth(
+			inputWidthHandler(equiationPropsObj.maxEquationDigit.toString().length),
+		);
+	}, [equiationPropsObj]);
+
+	useEffect(() => {
+		// console.log(console.log('equiationPropsObj.minEquationDigit changed'))
+		if (
+			equiationPropsObj.minEquationDigit >= equiationPropsObj.maxEquationDigit
+		) {
+			setEquiationPropsObj((prevState: EquationPropType) => ({
+				//other states in obj stay the same
+				...prevState,
+				maxEquationDigit: prevState.minEquationDigit + 1,
+			}));
+		}
+	}, [equiationPropsObj.minEquationDigit]);
+
+	useEffect(() => {
+		if (
+			equiationPropsObj.maxEquationDigit <= equiationPropsObj.minEquationDigit
+		) {
+			setEquiationPropsObj((prevState: EquationPropType) => ({
+				//other states in obj stay the same
+				...prevState,
+				minEquationDigit: prevState.minEquationDigit - 1,
+			}));
+		}
+	}, [equiationPropsObj.maxEquationDigit]);
 
 	return (
-		<div className="d-flex flex-column align-items-center mx-3">
-			<h3 className="text-center">Выберите опции</h3>
-			<div className="d-flex flex-row bd-highlight mb-3">
-				<div className="d-flex flex-column align-items-center mx-3">
-					<h4>Диапазон чиселs:</h4>
-					<div className="d-flex flex-row align-items-center bd-highlight mb-3">
-						<h4>От</h4>
-						<button
-							id="minDigitIncrement"
-							className={
-								(startStopState === 'stop'
-									? 'buttonClickAnimation '
-									: 'buttonDisableStyle ') +
-								'timerButton hoverAnimationDuration'
-							}
-							onClick={increaseMinDigit}>
-							<BsArrowUpCircle />
-						</button>
-						<h2 id="minDigit">{equiationPropsObj.minEquationDigit}</h2>
-						<input
-							type="text"
-							id="minDigiit"
-							className="form-control"
-							size={1}
-							onChange={(event) => typeMinDigitHandler(event)}
-							value={equiationPropsObj.minEquationDigit}
-						/>
-						<button
-							id="minDigitDecrement"
-							className={
-								(startStopState === 'stop'
-									? 'buttonClickAnimation '
-									: 'buttonDisableStyle ') +
-								'timerButton hoverAnimationDuration'
-							}
-							onClick={decreaseMinDigit}>
-							<BsArrowDownCircle />
-						</button>
-						<h4 className="ms-2">до</h4>
-						<button
-							id="maxDigitIncrement"
-							className={
-								(startStopState === 'stop'
-									? 'buttonClickAnimation '
-									: 'buttonDisableStyle ') +
-								'timerButton hoverAnimationDuration'
-							}
-							onClick={increaseMaxDigit}>
-							<BsArrowUpCircle />
-						</button>
-						<h2 id="maxDigit">{equiationPropsObj.maxEquationDigit}</h2>
-						<button
-							id="minDigitDecrement"
-							className={
-								(startStopState === 'stop'
-									? 'buttonClickAnimation '
-									: 'buttonDisableStyle ') +
-								'timerButton hoverAnimationDuration'
-							}
-							onClick={decreaseMaxDigit}>
-							<BsArrowDownCircle />
-						</button>
+		<div className='d-flex flex-column align-items-center mx-3'>
+			<h3 className='text-center'>Выберите опции</h3>
+			<div className='d-flex flex-row  mb-3'>
+				<div className='d-flex flex-column align-items-center mx-3'>
+					<h4>Диапазон чисел:</h4>
+					<div className='d-flex flex-row flex-wrap align-items-center  mb-3'>
+						<div
+							id='from'
+							className='d-flex flex-column flex-wrap align-items-center'>
+							<h4>От</h4>
+							<button
+								id='minDigitIncrement'
+								className={
+									(startStopState === 'stop'
+										? 'buttonClickAnimation '
+										: 'buttonDisableStyle ') +
+									'timerButton hoverAnimationDuration'
+								}
+								onClick={increaseMinDigit}>
+								<BsArrowUpCircle />
+							</button>
+							<input
+								style={{ width: minDigitInputWidth }}
+								type='text'
+								id='minDigiit'
+								className='digitInput h4'
+								size={1}
+								onChange={(event) => typeMinDigitHandler(event)}
+								value={equiationPropsObj.minEquationDigit}
+							/>
+							<button
+								id='minDigitDecrement'
+								className={
+									(startStopState === 'stop'
+										? 'buttonClickAnimation '
+										: 'buttonDisableStyle ') +
+									'timerButton hoverAnimationDuration'
+								}
+								onClick={decreaseMinDigit}>
+								<BsArrowDownCircle />
+							</button>
+						</div>
+						<div
+							id='to'
+							className='d-flex flex-column flex-wrap align-items-center'>
+							<h4 className='ms-2'>до</h4>
+							<button
+								id='maxDigitIncrement'
+								className={
+									(startStopState === 'stop'
+										? 'buttonClickAnimation '
+										: 'buttonDisableStyle ') +
+									'timerButton hoverAnimationDuration'
+								}
+								onClick={increaseMaxDigit}>
+								<BsArrowUpCircle />
+							</button>
+							<input
+								style={{ width: maxDigitInputWidth }}
+								type='text'
+								id='minDigiit'
+								className='digitInput h4'
+								size={1}
+								onChange={(event) => typeMaxDigitHandler(event)}
+								value={equiationPropsObj.maxEquationDigit}
+							/>
+							<button
+								id='minDigitDecrement'
+								className={
+									(startStopState === 'stop'
+										? 'buttonClickAnimation '
+										: 'buttonDisableStyle ') +
+									'timerButton hoverAnimationDuration'
+								}
+								onClick={decreaseMaxDigit}>
+								<BsArrowDownCircle />
+							</button>
+						</div>
 					</div>
 				</div>
 				<div>
 					<h4>Доступные действия:</h4>
-					<div className="d-flex flex-row bd-highlight m-2">
-						<label className="h4" htmlFor="adding">
+					<div className='d-flex flex-column flex-wrap align-items-center m-2'>
+						<label
+							className='h4'
+							htmlFor='adding'>
 							Сложение (+)
 						</label>
-						<input className="m-2" type="checkbox" id="adding" name="adding" />
+						<label className='switch ms-2'>
+							<input
+								type='checkbox'
+								id='adding'
+								defaultChecked={equiationPropsObj.adding}
+								onChange={toggleAddingState}
+								disabled={startStopState === 'stop' ? false : true}
+							/>
+							<span className='slider round'></span>
+						</label>
 					</div>
-					<div className="d-flex flex-row bd-highlight m-2">
-						<label className="h4" htmlFor="subtracting">
+					<div className='d-flex flex-column flex-wrap align-items-center m-2'>
+						<label
+							className='h4'
+							htmlFor='adding'>
 							Вычитание (-)
 						</label>
-						<input
-							className="m-2"
-							type="checkbox"
-							id="subtracting"
-							name="subtracting"
-						/>
+						<label className='switch ms-2'>
+							<input
+								type='checkbox'
+								id='adding'
+								defaultChecked={equiationPropsObj.subtracting}
+								onChange={toggleSubtractingState}
+								disabled={startStopState === 'stop' ? false : true}
+							/>
+							<span className='slider round'></span>
+						</label>
 					</div>
 				</div>
 			</div>
@@ -219,7 +340,7 @@ const App = (): JSX.Element => {
 		minEquationDigit: 0,
 		maxEquationDigit: 10,
 		adding: true,
-		subtracting: true,
+		subtracting: false,
 	});
 	const [timerMinutes, setTimerMinutes] = useState<number>(25);
 	const [timerSeconds, setTimerSeconds] = useState<number>(0);
@@ -299,19 +420,28 @@ const App = (): JSX.Element => {
 	}, []);
 	return (
 		<main
-			id="container"
-			className="vh-100 d-flex justify-content-center align-items-center elementFadeIn"
-			style={{ backgroundColor: bgColor }}>
+			id='container'
+			className='vh-100 d-flex justify-content-center align-items-center elementFadeIn'
+			style={{
+				backgroundColor: bgColor,
+				minHeight: '420px',
+			}}>
 			<div
-				id="app"
-				className="d-flex flex-column align-items-center appContainer">
-				<h2 id="firstLineTitle" style={{ width: 'max-content' }}>
+				id='app'
+				className='d-flex flex-column align-items-center appContainer'>
+				<h2
+					id='firstLineTitle'
+					style={{ width: 'max-content' }}>
 					Тренажёр арифметики.
 				</h2>
-				<h2 id="seconLineTitle" style={{ width: 'max-content' }}>
+				<h2
+					id='seconLineTitle'
+					style={{ width: 'max-content' }}>
 					Первый класс.
 				</h2>
-				<div id="controlBlock" className="d-flex">
+				<div
+					id='controlBlock'
+					className='d-flex'>
 					<EquiationControl
 						equiationPropsObj={equationProps}
 						setEquiationPropsObj={setEquationProps}
@@ -321,35 +451,37 @@ const App = (): JSX.Element => {
 						setTimerSeconds={setTimerSeconds}
 					/>
 				</div>
-				<div className="d-flex flex-column align-items-center">
-					<h4 id="timer-label" style={{ width: 'max-content' }}>
+				<div className='d-flex flex-column align-items-center'>
+					<h4
+						id='timer-label'
+						style={{ width: 'max-content' }}>
 						{currAction}
 					</h4>
-					<h1 id="time-left">
+					<h1 id='time-left'>
 						{timerMinutes < 10 ? '0' + timerMinutes : timerMinutes}:
 						{timerSeconds < 10 ? '0' + timerSeconds : timerSeconds}
 					</h1>
 				</div>
-				<div className="d-flex flex-row">
+				<div className='d-flex flex-row'>
 					<button
-						id="start_stop"
-						className="controlButton hoverAnimationDuration"
+						id='start_stop'
+						className='controlButton hoverAnimationDuration'
 						onClick={toggleTimerHandler}>
 						<AiOutlinePlayCircle />/
 						<AiOutlinePauseCircle />
 					</button>
 					<button
-						id="reset"
-						className="controlButton hoverAnimationDuration"
+						id='reset'
+						className='controlButton hoverAnimationDuration'
 						onClick={refreshHandler}>
 						<FiRefreshCcw />
 					</button>
 				</div>
 				<audio
-					id="beep"
+					id='beep'
 					ref={audioHtmlEl}
-					preload="auto"
-					src="https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"
+					preload='auto'
+					src='https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav'
 				/>
 			</div>
 		</main>
