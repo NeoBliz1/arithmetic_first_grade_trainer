@@ -48,13 +48,13 @@ type equationTrainerPropType = Omit<
 	equationControlPropsType,
 	'setEquationPropsObj'
 > & {
-	mistakesQuantity: number;
-	correctAnswersQuantity: number;
+	setMistakesQuantity: Dispatch<SetStateAction<number>>;
+	setCorrectAnswersQuantity: Dispatch<SetStateAction<number>>;
 };
 
 //control component
 const EquationControl = (props: equationControlPropsType): JSX.Element => {
-	const { equationPropsObj, setequationPropsObj, startStopState } = props;
+	const { equationPropsObj, setEquationPropsObj, startStopState } = props;
 
 	const [minDigitInputWidth, setMinDigitInputWidth] = useState('40px');
 	const [maxDigitInputWidth, setMaxDigitInputWidth] = useState('40px');
@@ -69,7 +69,7 @@ const EquationControl = (props: equationControlPropsType): JSX.Element => {
 	};
 	const increaseMinDigit: () => void = () => {
 		if (startStopState === 'stop') {
-			setequationPropsObj((prevState: EquationPropType) => ({
+			setEquationPropsObj((prevState: EquationControlPropInterface) => ({
 				...prevState,
 				minEquationDigit: prevState.minEquationDigit + 1,
 			}));
@@ -77,7 +77,7 @@ const EquationControl = (props: equationControlPropsType): JSX.Element => {
 	};
 	const decreaseMinDigit: () => void = () => {
 		if (startStopState === 'stop') {
-			setequationPropsObj((prevState: EquationPropType) => ({
+			setEquationPropsObj((prevState: EquationControlPropInterface) => ({
 				...prevState,
 				minEquationDigit: prevState.minEquationDigit - 1,
 			}));
@@ -86,7 +86,7 @@ const EquationControl = (props: equationControlPropsType): JSX.Element => {
 	const increaseMaxDigit: () => void = () => {
 		if (startStopState === 'stop') {
 			if (startStopState === 'stop') {
-				setequationPropsObj((prevState: EquationPropType) => ({
+				setEquationPropsObj((prevState: EquationControlPropInterface) => ({
 					...prevState,
 					maxEquationDigit: prevState.maxEquationDigit + 1,
 				}));
@@ -95,7 +95,7 @@ const EquationControl = (props: equationControlPropsType): JSX.Element => {
 	};
 	const decreaseMaxDigit: () => void = () => {
 		if (startStopState === 'stop') {
-			setequationPropsObj((prevState: EquationPropType) => ({
+			setEquationPropsObj((prevState: EquationControlPropInterface) => ({
 				...prevState,
 				maxEquationDigit: prevState.maxEquationDigit - 1,
 			}));
@@ -109,7 +109,7 @@ const EquationControl = (props: equationControlPropsType): JSX.Element => {
 			if (event) {
 				const target = event.target as HTMLInputElement;
 				if (typeof target.value === 'string') {
-					setequationPropsObj((prevState: EquationPropType) => ({
+					setEquationPropsObj((prevState: EquationControlPropInterface) => ({
 						//other states in obj stay the same
 						...prevState,
 						minEquationDigit: isNaN(parseInt(target.value))
@@ -128,7 +128,7 @@ const EquationControl = (props: equationControlPropsType): JSX.Element => {
 			if (event) {
 				const target = event.target as HTMLInputElement;
 				if (typeof target.value === 'string') {
-					setequationPropsObj((prevState: EquationPropType) => ({
+					setEquationPropsObj((prevState: EquationControlPropInterface) => ({
 						//other states in obj stay the same
 						...prevState,
 						maxEquationDigit: isNaN(parseInt(target.value))
@@ -142,7 +142,7 @@ const EquationControl = (props: equationControlPropsType): JSX.Element => {
 	};
 	const toggleAddingState: () => void = () => {
 		if (startStopState === 'stop') {
-			setequationPropsObj((prevState: EquationPropType) => {
+			setEquationPropsObj((prevState: EquationControlPropInterface) => {
 				return prevState.adding
 					? { ...prevState, adding: false }
 					: { ...prevState, adding: true };
@@ -151,7 +151,7 @@ const EquationControl = (props: equationControlPropsType): JSX.Element => {
 	};
 	const toggleSubtractingState: () => void = () => {
 		if (startStopState === 'stop') {
-			setequationPropsObj((prevState: EquationPropType) => {
+			setEquationPropsObj((prevState: EquationControlPropInterface) => {
 				return prevState.subtracting
 					? { ...prevState, subtracting: false }
 					: { ...prevState, subtracting: true };
@@ -163,7 +163,7 @@ const EquationControl = (props: equationControlPropsType): JSX.Element => {
 		// console.log(equationPropsObj.minEquationDigit.toString().length)
 		if (!equationPropsObj.adding && !equationPropsObj.subtracting) {
 			// console.log(' +- false');
-			setequationPropsObj((prevState: EquationPropType) => ({
+			setEquationPropsObj((prevState: EquationControlPropInterface) => ({
 				//other states in obj stay the same
 				...prevState,
 				adding: true,
@@ -182,7 +182,7 @@ const EquationControl = (props: equationControlPropsType): JSX.Element => {
 		if (
 			equationPropsObj.minEquationDigit >= equationPropsObj.maxEquationDigit
 		) {
-			setequationPropsObj((prevState: EquationPropType) => ({
+			setEquationPropsObj((prevState: EquationControlPropInterface) => ({
 				//other states in obj stay the same
 				...prevState,
 				maxEquationDigit: prevState.minEquationDigit + 1,
@@ -194,7 +194,7 @@ const EquationControl = (props: equationControlPropsType): JSX.Element => {
 		if (
 			equationPropsObj.maxEquationDigit <= equationPropsObj.minEquationDigit
 		) {
-			setequationPropsObj((prevState: EquationPropType) => ({
+			setEquationPropsObj((prevState: EquationControlPropInterface) => ({
 				//other states in obj stay the same
 				...prevState,
 				minEquationDigit: prevState.minEquationDigit - 1,
@@ -326,271 +326,29 @@ const EquationControl = (props: equationControlPropsType): JSX.Element => {
 
 //equation trainer component
 const EquationTrainer = (props: equationTrainerPropType): JSX.Element => {
-	const { equationPropsObj, setequationPropsObj, startStopState } = props;
+	const { equationPropsObj, startStopState, setMistakesQuantity, setCorrectAnswersQuantity } = props;
 
-	const [minDigitInputWidth, setMinDigitInputWidth] = useState('40px');
-	const [maxDigitInputWidth, setMaxDigitInputWidth] = useState('40px');
-
-	//input width handling depending on the length of the input value
-	type inputHandlerType = (valueLength: number) => string;
-	const inputWidthHandler: inputHandlerType = (valueLength) => {
-		const newNumberInputWidth =
-			40 + (valueLength === 1 ? 0 : 9.67 * valueLength);
-		// console.log(newNumberInputWidth.toString()+'px')
-		return newNumberInputWidth.toString() + 'px';
-	};
-	const increaseMinDigit: () => void = () => {
-		if (startStopState === 'stop') {
-			setequationPropsObj((prevState: EquationPropType) => ({
-				...prevState,
-				minEquationDigit: prevState.minEquationDigit + 1,
-			}));
-		}
-	};
-	const decreaseMinDigit: () => void = () => {
-		if (startStopState === 'stop') {
-			setequationPropsObj((prevState: EquationPropType) => ({
-				...prevState,
-				minEquationDigit: prevState.minEquationDigit - 1,
-			}));
-		}
-	};
-	const increaseMaxDigit: () => void = () => {
-		if (startStopState === 'stop') {
-			if (startStopState === 'stop') {
-				setequationPropsObj((prevState: EquationPropType) => ({
-					...prevState,
-					maxEquationDigit: prevState.maxEquationDigit + 1,
-				}));
-			}
-		}
-	};
-	const decreaseMaxDigit: () => void = () => {
-		if (startStopState === 'stop') {
-			setequationPropsObj((prevState: EquationPropType) => ({
-				...prevState,
-				maxEquationDigit: prevState.maxEquationDigit - 1,
-			}));
-		}
-	};
-
-	const typeMinDigitHandler: (
-		event: ChangeEvent<HTMLInputElement>,
-	) => void = () => {
-		if (startStopState === 'stop') {
-			if (event) {
-				const target = event.target as HTMLInputElement;
-				if (typeof target.value === 'string') {
-					setequationPropsObj((prevState: EquationPropType) => ({
-						//other states in obj stay the same
-						...prevState,
-						minEquationDigit: isNaN(parseInt(target.value))
-							? prevState.minEquationDigit
-							: parseInt(target.value),
-					}));
-				}
-			}
-		}
-		// console.log(event?.target);
-	};
-	const typeMaxDigitHandler: (
-		event: ChangeEvent<HTMLInputElement>,
-	) => void = () => {
-		if (startStopState === 'stop') {
-			if (event) {
-				const target = event.target as HTMLInputElement;
-				if (typeof target.value === 'string') {
-					setequationPropsObj((prevState: EquationPropType) => ({
-						//other states in obj stay the same
-						...prevState,
-						maxEquationDigit: isNaN(parseInt(target.value))
-							? prevState.maxEquationDigit
-							: parseInt(target.value),
-					}));
-				}
-			}
-		}
-		// console.log(event?.target);
-	};
-	const toggleAddingState: () => void = () => {
-		if (startStopState === 'stop') {
-			setequationPropsObj((prevState: EquationPropType) => {
-				return prevState.adding
-					? { ...prevState, adding: false }
-					: { ...prevState, adding: true };
-			});
-		}
-	};
-	const toggleSubtractingState: () => void = () => {
-		if (startStopState === 'stop') {
-			setequationPropsObj((prevState: EquationPropType) => {
-				return prevState.subtracting
-					? { ...prevState, subtracting: false }
-					: { ...prevState, subtracting: true };
-			});
-		}
-	};
-	//balance bad states
-	useEffect(() => {
-		// console.log(equationPropsObj.minEquationDigit.toString().length)
-		if (!equationPropsObj.adding && !equationPropsObj.subtracting) {
-			// console.log(' +- false');
-			setequationPropsObj((prevState: EquationPropType) => ({
-				//other states in obj stay the same
-				...prevState,
-				adding: true,
-			}));
-		}
-		setMinDigitInputWidth(
-			inputWidthHandler(equationPropsObj.minEquationDigit.toString().length),
-		);
-		setMaxDigitInputWidth(
-			inputWidthHandler(equationPropsObj.maxEquationDigit.toString().length),
-		);
-	}, [equationPropsObj]);
-
-	useEffect(() => {
-		// console.log(console.log('equationPropsObj.minEquationDigit changed'))
-		if (
-			equationPropsObj.minEquationDigit >= equationPropsObj.maxEquationDigit
-		) {
-			setequationPropsObj((prevState: EquationPropType) => ({
-				//other states in obj stay the same
-				...prevState,
-				maxEquationDigit: prevState.minEquationDigit + 1,
-			}));
-		}
-	}, [equationPropsObj.minEquationDigit]);
-
-	useEffect(() => {
-		if (
-			equationPropsObj.maxEquationDigit <= equationPropsObj.minEquationDigit
-		) {
-			setequationPropsObj((prevState: EquationPropType) => ({
-				//other states in obj stay the same
-				...prevState,
-				minEquationDigit: prevState.minEquationDigit - 1,
-			}));
-		}
-	}, [equationPropsObj.maxEquationDigit]);
 	return (
 		<div className='d-flex flex-column align-items-center mx-3'>
 			<h3 className='text-center'>Выберите опции</h3>
 			<div className='d-flex flex-row'>
-				<div className='d-flex flex-column align-items-center mx-3'>
+				<div className='d-flex flex-row align-items-center mx-3'>
 					<h4>Диапазон чисел:</h4>
 					<div className='d-flex flex-row flex-wrap align-items-center'>
 						<div
 							id='from'
 							className='d-flex flex-column flex-wrap align-items-center'>
 							<h4>От</h4>
-							<button
-								id='minDigitIncrement'
-								className={
-									(startStopState === 'stop'
-										? 'buttonClickAnimation '
-										: 'buttonDisableStyle ') +
-									'timerButton hoverAnimationDuration'
-								}
-								onClick={increaseMinDigit}>
-								<BsArrowUpCircle />
-							</button>
-							<input
-								style={{ width: minDigitInputWidth }}
-								type='text'
-								id='minDigiit'
-								className='digitInput h4'
-								size={1}
-								onChange={(event) => typeMinDigitHandler(event)}
-								value={equationPropsObj.minEquationDigit}
-							/>
-							<button
-								id='minDigitDecrement'
-								className={
-									(startStopState === 'stop'
-										? 'buttonClickAnimation '
-										: 'buttonDisableStyle ') +
-									'timerButton hoverAnimationDuration'
-								}
-								onClick={decreaseMinDigit}>
-								<BsArrowDownCircle />
-							</button>
+							
 						</div>
 						<div
 							id='to'
 							className='d-flex flex-column flex-wrap align-items-center'>
 							<h4 className='ms-2'>до</h4>
-							<button
-								id='maxDigitIncrement'
-								className={
-									(startStopState === 'stop'
-										? 'buttonClickAnimation '
-										: 'buttonDisableStyle ') +
-									'timerButton hoverAnimationDuration'
-								}
-								onClick={increaseMaxDigit}>
-								<BsArrowUpCircle />
-							</button>
-							<input
-								style={{ width: maxDigitInputWidth }}
-								type='text'
-								id='minDigiit'
-								className='digitInput h4'
-								size={1}
-								onChange={(event) => typeMaxDigitHandler(event)}
-								value={equationPropsObj.maxEquationDigit}
-							/>
-							<button
-								id='minDigitDecrement'
-								className={
-									(startStopState === 'stop'
-										? 'buttonClickAnimation '
-										: 'buttonDisableStyle ') +
-									'timerButton hoverAnimationDuration'
-								}
-								onClick={decreaseMaxDigit}>
-								<BsArrowDownCircle />
-							</button>
+							
 						</div>
 					</div>
-				</div>
-				<div>
-					<h4>Доступные действия:</h4>
-					<div className='d-flex flex-column flex-wrap align-items-center m-2'>
-						<label
-							className='h4'
-							htmlFor='adding'>
-							Сложение (+)
-						</label>
-						<label className='switch ms-2'>
-							<input
-								type='checkbox'
-								id='adding'
-								checked={equationPropsObj.adding}
-								onChange={toggleAddingState}
-								disabled={startStopState === 'stop' ? false : true}
-							/>
-							<span className='slider round'></span>
-						</label>
-					</div>
-					<div className='d-flex flex-column flex-wrap align-items-center m-2'>
-						<label
-							className='h4'
-							htmlFor='adding'>
-							Вычитание (-)
-						</label>
-						<label className='switch ms-2'>
-							<input
-								type='checkbox'
-								id='adding'
-								defaultChecked={equationPropsObj.subtracting}
-								onChange={toggleSubtractingState}
-								disabled={startStopState === 'stop' ? false : true}
-							/>
-							<span className='slider round'></span>
-						</label>
-					</div>
-				</div>
+				</div>	
 			</div>
 		</div>
 	);
@@ -699,22 +457,45 @@ const App = (): JSX.Element => {
 						<FiRefreshCcw />
 					</button>
 				</div>
-				<div className='d-flex flex-column align-items-center'>
-					<h4
-						id='timer-label'
-						style={{ width: 'max-content' }}>
-						Время после старта
-					</h4>
-					<h1 id='time-left'>
-						{timerMinutes < 10 ? '0' + timerMinutes : timerMinutes}:
-						{timerSeconds < 10 ? '0' + timerSeconds : timerSeconds}
-					</h1>
+				<div className="d-flex flex-row flex-wrap align-items-center justify-content-center">
+					<div className='d-flex flex-column align-items-center'>
+						<h4
+							id='timer-label'
+							style={{ width: 'max-content' }}>
+							Время после старта
+						</h4>
+						<h1 id='time-left'>
+							{timerMinutes < 10 ? '0' + timerMinutes : timerMinutes}:
+							{timerSeconds < 10 ? '0' + timerSeconds : timerSeconds}
+						</h1>
+					</div>
+					<div className='d-flex flex-column align-items-center'>
+						<h4
+							id='timer-label'
+							style={{ width: 'max-content' }}>
+							Число верных ответов:
+						</h4>
+						<h1 id='time-left'>
+							{correctAnswersNumber}
+						</h1>
+					</div>
+					<div className='d-flex flex-column align-items-center'>
+						<h4
+							id='timer-label'
+							style={{ width: 'max-content' }}>
+							Число неверных ответов:
+						</h4>
+						<h1 id='time-left'>
+							{wrongAnswersNumber}
+						</h1>
+					</div>
 				</div>
+				
 				<EquationTrainer
 					equationPropsObj={equationProps}
 					startStopState={startStopState}
-					mistakesQuantity={wrongAnswersNumber}
-					correctAnswersQuantity={correctAnswersNumber}
+					setMistakesQuantity={setCorrectAnswersNumber}
+					setCorrectAnswersQuantity={setWrongAnswersNumber}
 				/>
 			</div>
 		</main>
