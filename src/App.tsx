@@ -67,8 +67,8 @@ const EquiationControl = (props: equationControlSettingsType): JSX.Element => {
 		setTimerSeconds,
 	} = props;
 
-	const [minDigitInputWidth, setMinDigitInputWidth] = useState('35px');
-	const [maxDigitInputWidth, setMaxDigitInputWidth] = useState('35px');
+	const [minDigitInputWidth, setMinDigitInputWidth] = useState('40px');
+	const [maxDigitInputWidth, setMaxDigitInputWidth] = useState('40px');
 
 	//input width handling depending on the length of the input value
 	type inputHandlerType = (valueLength: number) => string;
@@ -171,12 +171,15 @@ const EquiationControl = (props: equationControlSettingsType): JSX.Element => {
 	};
 	//balance bad states
 	useEffect(() => {
-		console.log(equiationPropsObj.adding);
-		console.log(equiationPropsObj.subtracting);
-		if (!equiationPropsObj.adding && !equiationPropsObj.subtracting) {
-			toggleAddingState();
-		}
 		// console.log(equiationPropsObj.minEquationDigit.toString().length)
+		if (!equiationPropsObj.adding && !equiationPropsObj.subtracting) {
+			// console.log(' +- false');
+			setEquiationPropsObj((prevState: EquationPropType) => ({
+				//other states in obj stay the same
+				...prevState,
+				adding: true,
+			}));
+		}
 		setMinDigitInputWidth(
 			inputWidthHandler(equiationPropsObj.minEquationDigit.toString().length),
 		);
@@ -209,7 +212,6 @@ const EquiationControl = (props: equationControlSettingsType): JSX.Element => {
 			}));
 		}
 	}, [equiationPropsObj.maxEquationDigit]);
-
 	return (
 		<div className='d-flex flex-column align-items-center mx-3'>
 			<h3 className='text-center'>Выберите опции</h3>
@@ -303,7 +305,7 @@ const EquiationControl = (props: equationControlSettingsType): JSX.Element => {
 							<input
 								type='checkbox'
 								id='adding'
-								defaultChecked={equiationPropsObj.adding}
+								checked={equiationPropsObj.adding}
 								onChange={toggleAddingState}
 								disabled={startStopState === 'stop' ? false : true}
 							/>
