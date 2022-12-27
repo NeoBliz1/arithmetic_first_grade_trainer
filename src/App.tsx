@@ -1,12 +1,11 @@
 import React, {
 	useState,
+	useEffect,
 	useLayoutEffect,
-	useRef,
 	//import react types
-	MutableRefObject,
 	Dispatch,
 	SetStateAction,
-	FC,
+	ChangeEvent,
 } from 'react';
 
 import { BsArrowUpCircle, BsArrowDownCircle } from 'react-icons/bs';
@@ -29,148 +28,567 @@ const colorArray = [
 	'#ffb74d',
 ];
 
-interface timeControlType {
-	id?: string;
-	name: string;
-	length: number;
+interface EquationControlPropInterface {
+	minEquationDigit: number;
+	maxEquationDigit: number;
+	adding: boolean;
+	subtracting: boolean;
 }
-type setSessionLengthType = Dispatch<SetStateAction<timeControlType>>;
+type setEquationPropsType = Dispatch<
+	SetStateAction<EquationControlPropInterface>
+>;
 
-type TimeControlPropsType = {
-	timeControlObj: timeControlType;
-	setState: setSessionLengthType;
-	currAction: string;
+type equationControlPropsType = {
+	equationPropsObj: EquationControlPropInterface;
+	setEquationPropsObj: setEquationPropsType;
 	startStopState: string;
-	setTimerMinutes: Dispatch<SetStateAction<number>>;
-	setTimerSeconds: Dispatch<SetStateAction<number>>;
 };
 
-const EquiationControl: FC<TimeControlPropsType> = (
-	props: TimeControlPropsType,
-) => {
-	const {
-		timeControlObj,
-		setState,
-		currAction,
-		startStopState,
-		setTimerMinutes,
-		setTimerSeconds,
-	} = props;
-	const refreshActionLength: (
-		prevState: timeControlType,
-		arithmeticOperation: string,
-	) => timeControlType = (prevState, arithmeticOperation) => {
-		let newlengthState: number;
-		if (arithmeticOperation === 'increase') {
-			newlengthState = prevState.length === 60 ? 60 : prevState.length + 1;
-		} else {
-			newlengthState = prevState.length === 1 ? 1 : prevState.length - 1;
-		}
+type equationTrainerPropType = Omit<
+	equationControlPropsType,
+	'setEquationPropsObj'
+> & {
+	mistakesQuantity: number;
+	correctAnswersQuantity: number;
+};
 
-		if (prevState.name === currAction) {
-			setTimerMinutes(newlengthState);
-			setTimerSeconds(0);
-		}
-		return {
-			id: prevState.id,
-			name: prevState.name,
-			length: newlengthState,
-		};
+//control component
+const EquationControl = (props: equationControlPropsType): JSX.Element => {
+	const { equationPropsObj, setequationPropsObj, startStopState } = props;
+
+	const [minDigitInputWidth, setMinDigitInputWidth] = useState('40px');
+	const [maxDigitInputWidth, setMaxDigitInputWidth] = useState('40px');
+
+	//input width handling depending on the length of the input value
+	type inputHandlerType = (valueLength: number) => string;
+	const inputWidthHandler: inputHandlerType = (valueLength) => {
+		const newNumberInputWidth =
+			40 + (valueLength === 1 ? 0 : 9.67 * valueLength);
+		// console.log(newNumberInputWidth.toString()+'px')
+		return newNumberInputWidth.toString() + 'px';
 	};
-	const increaseLength: () => void = () => {
+	const increaseMinDigit: () => void = () => {
 		if (startStopState === 'stop') {
-			setState((prevState: timeControlType) =>
-				refreshActionLength(prevState, 'increase'),
-			);
+			setequationPropsObj((prevState: EquationPropType) => ({
+				...prevState,
+				minEquationDigit: prevState.minEquationDigit + 1,
+			}));
+		}
+	};
+	const decreaseMinDigit: () => void = () => {
+		if (startStopState === 'stop') {
+			setequationPropsObj((prevState: EquationPropType) => ({
+				...prevState,
+				minEquationDigit: prevState.minEquationDigit - 1,
+			}));
+		}
+	};
+	const increaseMaxDigit: () => void = () => {
+		if (startStopState === 'stop') {
+			if (startStopState === 'stop') {
+				setequationPropsObj((prevState: EquationPropType) => ({
+					...prevState,
+					maxEquationDigit: prevState.maxEquationDigit + 1,
+				}));
+			}
+		}
+	};
+	const decreaseMaxDigit: () => void = () => {
+		if (startStopState === 'stop') {
+			setequationPropsObj((prevState: EquationPropType) => ({
+				...prevState,
+				maxEquationDigit: prevState.maxEquationDigit - 1,
+			}));
 		}
 	};
 
-	const decreaseLength: () => void = () => {
+	const typeMinDigitHandler: (
+		event: ChangeEvent<HTMLInputElement>,
+	) => void = () => {
 		if (startStopState === 'stop') {
-			setState((prevState: timeControlType) =>
-				refreshActionLength(prevState, 'decrease'),
-			);
+			if (event) {
+				const target = event.target as HTMLInputElement;
+				if (typeof target.value === 'string') {
+					setequationPropsObj((prevState: EquationPropType) => ({
+						//other states in obj stay the same
+						...prevState,
+						minEquationDigit: isNaN(parseInt(target.value))
+							? prevState.minEquationDigit
+							: parseInt(target.value),
+					}));
+				}
+			}
+		}
+		// console.log(event?.target);
+	};
+	const typeMaxDigitHandler: (
+		event: ChangeEvent<HTMLInputElement>,
+	) => void = () => {
+		if (startStopState === 'stop') {
+			if (event) {
+				const target = event.target as HTMLInputElement;
+				if (typeof target.value === 'string') {
+					setequationPropsObj((prevState: EquationPropType) => ({
+						//other states in obj stay the same
+						...prevState,
+						maxEquationDigit: isNaN(parseInt(target.value))
+							? prevState.maxEquationDigit
+							: parseInt(target.value),
+					}));
+				}
+			}
+		}
+		// console.log(event?.target);
+	};
+	const toggleAddingState: () => void = () => {
+		if (startStopState === 'stop') {
+			setequationPropsObj((prevState: EquationPropType) => {
+				return prevState.adding
+					? { ...prevState, adding: false }
+					: { ...prevState, adding: true };
+			});
 		}
 	};
+	const toggleSubtractingState: () => void = () => {
+		if (startStopState === 'stop') {
+			setequationPropsObj((prevState: EquationPropType) => {
+				return prevState.subtracting
+					? { ...prevState, subtracting: false }
+					: { ...prevState, subtracting: true };
+			});
+		}
+	};
+	//balance bad states
+	useEffect(() => {
+		// console.log(equationPropsObj.minEquationDigit.toString().length)
+		if (!equationPropsObj.adding && !equationPropsObj.subtracting) {
+			// console.log(' +- false');
+			setequationPropsObj((prevState: EquationPropType) => ({
+				//other states in obj stay the same
+				...prevState,
+				adding: true,
+			}));
+		}
+		setMinDigitInputWidth(
+			inputWidthHandler(equationPropsObj.minEquationDigit.toString().length),
+		);
+		setMaxDigitInputWidth(
+			inputWidthHandler(equationPropsObj.maxEquationDigit.toString().length),
+		);
+	}, [equationPropsObj]);
+
+	useEffect(() => {
+		// console.log(console.log('equationPropsObj.minEquationDigit changed'))
+		if (
+			equationPropsObj.minEquationDigit >= equationPropsObj.maxEquationDigit
+		) {
+			setequationPropsObj((prevState: EquationPropType) => ({
+				//other states in obj stay the same
+				...prevState,
+				maxEquationDigit: prevState.minEquationDigit + 1,
+			}));
+		}
+	}, [equationPropsObj.minEquationDigit]);
+
+	useEffect(() => {
+		if (
+			equationPropsObj.maxEquationDigit <= equationPropsObj.minEquationDigit
+		) {
+			setequationPropsObj((prevState: EquationPropType) => ({
+				//other states in obj stay the same
+				...prevState,
+				minEquationDigit: prevState.minEquationDigit - 1,
+			}));
+		}
+	}, [equationPropsObj.maxEquationDigit]);
 	return (
-		<div
-			id={timeControlObj.name}
-			className="d-flex flex-column align-items-center mx-3">
-			<h3 id={timeControlObj.id + '-label'} className="text-center">
-				Выберите опции !!
-			</h3>
-			<div className="d-flex flex-row bd-highlight mb-3">
-				<div className="d-flex flex-column align-items-center mx-3">
+		<div className='d-flex flex-column align-items-center mx-3'>
+			<h3 className='text-center'>Выберите опции</h3>
+			<div className='d-flex flex-row'>
+				<div className='d-flex flex-column align-items-center mx-3'>
 					<h4>Диапазон чисел:</h4>
-					<div className="d-flex flex-row align-items-center bd-highlight mb-3">
-						<h4>От</h4>
-						<button
-							id={timeControlObj.id + '-increment'}
-							className={
-								(startStopState === 'stop'
-									? 'buttonClickAnimation '
-									: 'buttonDisableStyle ') +
-								'timerButton hoverAnimationDuration'
-							}
-							onClick={increaseLength}>
-							<BsArrowUpCircle />
-						</button>
-						<h2 id={timeControlObj.id + '-length'}>{timeControlObj.length}</h2>
-						<button
-							id={timeControlObj.id + '-decrement'}
-							className={
-								(startStopState === 'stop'
-									? 'buttonClickAnimation '
-									: 'buttonDisableStyle ') +
-								'timerButton hoverAnimationDuration'
-							}
-							onClick={decreaseLength}>
-							<BsArrowDownCircle />
-						</button>
-						<h4 className="ms-2">до!</h4>
-						<button
-							id={timeControlObj.id + '-increment'}
-							className={
-								(startStopState === 'stop'
-									? 'buttonClickAnimation '
-									: 'buttonDisableStyle ') +
-								'timerButton hoverAnimationDuration'
-							}
-							onClick={increaseLength}>
-							<BsArrowUpCircle />
-						</button>
-						<h2 id={timeControlObj.id + '-length'}>{timeControlObj.length}</h2>
-						<button
-							id={timeControlObj.id + '-decrement'}
-							className={
-								(startStopState === 'stop'
-									? 'buttonClickAnimation '
-									: 'buttonDisableStyle ') +
-								'timerButton hoverAnimationDuration'
-							}
-							onClick={decreaseLength}>
-							<BsArrowDownCircle />
-						</button>
+					<div className='d-flex flex-row flex-wrap align-items-center'>
+						<div
+							id='from'
+							className='d-flex flex-column flex-wrap align-items-center'>
+							<h4>От</h4>
+							<button
+								id='minDigitIncrement'
+								className={
+									(startStopState === 'stop'
+										? 'buttonClickAnimation '
+										: 'buttonDisableStyle ') +
+									'timerButton hoverAnimationDuration'
+								}
+								onClick={increaseMinDigit}>
+								<BsArrowUpCircle />
+							</button>
+							<input
+								style={{ width: minDigitInputWidth }}
+								type='text'
+								id='minDigiit'
+								className='digitInput h4'
+								size={1}
+								onChange={(event) => typeMinDigitHandler(event)}
+								value={equationPropsObj.minEquationDigit}
+							/>
+							<button
+								id='minDigitDecrement'
+								className={
+									(startStopState === 'stop'
+										? 'buttonClickAnimation '
+										: 'buttonDisableStyle ') +
+									'timerButton hoverAnimationDuration'
+								}
+								onClick={decreaseMinDigit}>
+								<BsArrowDownCircle />
+							</button>
+						</div>
+						<div
+							id='to'
+							className='d-flex flex-column flex-wrap align-items-center'>
+							<h4 className='ms-2'>до</h4>
+							<button
+								id='maxDigitIncrement'
+								className={
+									(startStopState === 'stop'
+										? 'buttonClickAnimation '
+										: 'buttonDisableStyle ') +
+									'timerButton hoverAnimationDuration'
+								}
+								onClick={increaseMaxDigit}>
+								<BsArrowUpCircle />
+							</button>
+							<input
+								style={{ width: maxDigitInputWidth }}
+								type='text'
+								id='minDigiit'
+								className='digitInput h4'
+								size={1}
+								onChange={(event) => typeMaxDigitHandler(event)}
+								value={equationPropsObj.maxEquationDigit}
+							/>
+							<button
+								id='minDigitDecrement'
+								className={
+									(startStopState === 'stop'
+										? 'buttonClickAnimation '
+										: 'buttonDisableStyle ') +
+									'timerButton hoverAnimationDuration'
+								}
+								onClick={decreaseMaxDigit}>
+								<BsArrowDownCircle />
+							</button>
+						</div>
 					</div>
 				</div>
 				<div>
 					<h4>Доступные действия:</h4>
-					<div className="d-flex flex-row bd-highlight m-2">
-						<label className="h4" htmlFor="adding">
+					<div className='d-flex flex-column flex-wrap align-items-center m-2'>
+						<label
+							className='h4'
+							htmlFor='adding'>
 							Сложение (+)
 						</label>
-						<input className="m-2" type="checkbox" id="adding" name="adding" />
+						<label className='switch ms-2'>
+							<input
+								type='checkbox'
+								id='adding'
+								checked={equationPropsObj.adding}
+								onChange={toggleAddingState}
+								disabled={startStopState === 'stop' ? false : true}
+							/>
+							<span className='slider round'></span>
+						</label>
 					</div>
-					<div className="d-flex flex-row bd-highlight m-2">
-						<label className="h4" htmlFor="subtracting">
+					<div className='d-flex flex-column flex-wrap align-items-center m-2'>
+						<label
+							className='h4'
+							htmlFor='adding'>
 							Вычитание (-)
 						</label>
-						<input
-							className="m-2"
-							type="checkbox"
-							id="subtracting"
-							name="subtracting"
-						/>
+						<label className='switch ms-2'>
+							<input
+								type='checkbox'
+								id='adding'
+								defaultChecked={equationPropsObj.subtracting}
+								onChange={toggleSubtractingState}
+								disabled={startStopState === 'stop' ? false : true}
+							/>
+							<span className='slider round'></span>
+						</label>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+};
+
+//equation trainer component
+const EquationTrainer = (props: equationTrainerPropType): JSX.Element => {
+	const { equationPropsObj, setequationPropsObj, startStopState } = props;
+
+	const [minDigitInputWidth, setMinDigitInputWidth] = useState('40px');
+	const [maxDigitInputWidth, setMaxDigitInputWidth] = useState('40px');
+
+	//input width handling depending on the length of the input value
+	type inputHandlerType = (valueLength: number) => string;
+	const inputWidthHandler: inputHandlerType = (valueLength) => {
+		const newNumberInputWidth =
+			40 + (valueLength === 1 ? 0 : 9.67 * valueLength);
+		// console.log(newNumberInputWidth.toString()+'px')
+		return newNumberInputWidth.toString() + 'px';
+	};
+	const increaseMinDigit: () => void = () => {
+		if (startStopState === 'stop') {
+			setequationPropsObj((prevState: EquationPropType) => ({
+				...prevState,
+				minEquationDigit: prevState.minEquationDigit + 1,
+			}));
+		}
+	};
+	const decreaseMinDigit: () => void = () => {
+		if (startStopState === 'stop') {
+			setequationPropsObj((prevState: EquationPropType) => ({
+				...prevState,
+				minEquationDigit: prevState.minEquationDigit - 1,
+			}));
+		}
+	};
+	const increaseMaxDigit: () => void = () => {
+		if (startStopState === 'stop') {
+			if (startStopState === 'stop') {
+				setequationPropsObj((prevState: EquationPropType) => ({
+					...prevState,
+					maxEquationDigit: prevState.maxEquationDigit + 1,
+				}));
+			}
+		}
+	};
+	const decreaseMaxDigit: () => void = () => {
+		if (startStopState === 'stop') {
+			setequationPropsObj((prevState: EquationPropType) => ({
+				...prevState,
+				maxEquationDigit: prevState.maxEquationDigit - 1,
+			}));
+		}
+	};
+
+	const typeMinDigitHandler: (
+		event: ChangeEvent<HTMLInputElement>,
+	) => void = () => {
+		if (startStopState === 'stop') {
+			if (event) {
+				const target = event.target as HTMLInputElement;
+				if (typeof target.value === 'string') {
+					setequationPropsObj((prevState: EquationPropType) => ({
+						//other states in obj stay the same
+						...prevState,
+						minEquationDigit: isNaN(parseInt(target.value))
+							? prevState.minEquationDigit
+							: parseInt(target.value),
+					}));
+				}
+			}
+		}
+		// console.log(event?.target);
+	};
+	const typeMaxDigitHandler: (
+		event: ChangeEvent<HTMLInputElement>,
+	) => void = () => {
+		if (startStopState === 'stop') {
+			if (event) {
+				const target = event.target as HTMLInputElement;
+				if (typeof target.value === 'string') {
+					setequationPropsObj((prevState: EquationPropType) => ({
+						//other states in obj stay the same
+						...prevState,
+						maxEquationDigit: isNaN(parseInt(target.value))
+							? prevState.maxEquationDigit
+							: parseInt(target.value),
+					}));
+				}
+			}
+		}
+		// console.log(event?.target);
+	};
+	const toggleAddingState: () => void = () => {
+		if (startStopState === 'stop') {
+			setequationPropsObj((prevState: EquationPropType) => {
+				return prevState.adding
+					? { ...prevState, adding: false }
+					: { ...prevState, adding: true };
+			});
+		}
+	};
+	const toggleSubtractingState: () => void = () => {
+		if (startStopState === 'stop') {
+			setequationPropsObj((prevState: EquationPropType) => {
+				return prevState.subtracting
+					? { ...prevState, subtracting: false }
+					: { ...prevState, subtracting: true };
+			});
+		}
+	};
+	//balance bad states
+	useEffect(() => {
+		// console.log(equationPropsObj.minEquationDigit.toString().length)
+		if (!equationPropsObj.adding && !equationPropsObj.subtracting) {
+			// console.log(' +- false');
+			setequationPropsObj((prevState: EquationPropType) => ({
+				//other states in obj stay the same
+				...prevState,
+				adding: true,
+			}));
+		}
+		setMinDigitInputWidth(
+			inputWidthHandler(equationPropsObj.minEquationDigit.toString().length),
+		);
+		setMaxDigitInputWidth(
+			inputWidthHandler(equationPropsObj.maxEquationDigit.toString().length),
+		);
+	}, [equationPropsObj]);
+
+	useEffect(() => {
+		// console.log(console.log('equationPropsObj.minEquationDigit changed'))
+		if (
+			equationPropsObj.minEquationDigit >= equationPropsObj.maxEquationDigit
+		) {
+			setequationPropsObj((prevState: EquationPropType) => ({
+				//other states in obj stay the same
+				...prevState,
+				maxEquationDigit: prevState.minEquationDigit + 1,
+			}));
+		}
+	}, [equationPropsObj.minEquationDigit]);
+
+	useEffect(() => {
+		if (
+			equationPropsObj.maxEquationDigit <= equationPropsObj.minEquationDigit
+		) {
+			setequationPropsObj((prevState: EquationPropType) => ({
+				//other states in obj stay the same
+				...prevState,
+				minEquationDigit: prevState.minEquationDigit - 1,
+			}));
+		}
+	}, [equationPropsObj.maxEquationDigit]);
+	return (
+		<div className='d-flex flex-column align-items-center mx-3'>
+			<h3 className='text-center'>Выберите опции</h3>
+			<div className='d-flex flex-row'>
+				<div className='d-flex flex-column align-items-center mx-3'>
+					<h4>Диапазон чисел:</h4>
+					<div className='d-flex flex-row flex-wrap align-items-center'>
+						<div
+							id='from'
+							className='d-flex flex-column flex-wrap align-items-center'>
+							<h4>От</h4>
+							<button
+								id='minDigitIncrement'
+								className={
+									(startStopState === 'stop'
+										? 'buttonClickAnimation '
+										: 'buttonDisableStyle ') +
+									'timerButton hoverAnimationDuration'
+								}
+								onClick={increaseMinDigit}>
+								<BsArrowUpCircle />
+							</button>
+							<input
+								style={{ width: minDigitInputWidth }}
+								type='text'
+								id='minDigiit'
+								className='digitInput h4'
+								size={1}
+								onChange={(event) => typeMinDigitHandler(event)}
+								value={equationPropsObj.minEquationDigit}
+							/>
+							<button
+								id='minDigitDecrement'
+								className={
+									(startStopState === 'stop'
+										? 'buttonClickAnimation '
+										: 'buttonDisableStyle ') +
+									'timerButton hoverAnimationDuration'
+								}
+								onClick={decreaseMinDigit}>
+								<BsArrowDownCircle />
+							</button>
+						</div>
+						<div
+							id='to'
+							className='d-flex flex-column flex-wrap align-items-center'>
+							<h4 className='ms-2'>до</h4>
+							<button
+								id='maxDigitIncrement'
+								className={
+									(startStopState === 'stop'
+										? 'buttonClickAnimation '
+										: 'buttonDisableStyle ') +
+									'timerButton hoverAnimationDuration'
+								}
+								onClick={increaseMaxDigit}>
+								<BsArrowUpCircle />
+							</button>
+							<input
+								style={{ width: maxDigitInputWidth }}
+								type='text'
+								id='minDigiit'
+								className='digitInput h4'
+								size={1}
+								onChange={(event) => typeMaxDigitHandler(event)}
+								value={equationPropsObj.maxEquationDigit}
+							/>
+							<button
+								id='minDigitDecrement'
+								className={
+									(startStopState === 'stop'
+										? 'buttonClickAnimation '
+										: 'buttonDisableStyle ') +
+									'timerButton hoverAnimationDuration'
+								}
+								onClick={decreaseMaxDigit}>
+								<BsArrowDownCircle />
+							</button>
+						</div>
+					</div>
+				</div>
+				<div>
+					<h4>Доступные действия:</h4>
+					<div className='d-flex flex-column flex-wrap align-items-center m-2'>
+						<label
+							className='h4'
+							htmlFor='adding'>
+							Сложение (+)
+						</label>
+						<label className='switch ms-2'>
+							<input
+								type='checkbox'
+								id='adding'
+								checked={equationPropsObj.adding}
+								onChange={toggleAddingState}
+								disabled={startStopState === 'stop' ? false : true}
+							/>
+							<span className='slider round'></span>
+						</label>
+					</div>
+					<div className='d-flex flex-column flex-wrap align-items-center m-2'>
+						<label
+							className='h4'
+							htmlFor='adding'>
+							Вычитание (-)
+						</label>
+						<label className='switch ms-2'>
+							<input
+								type='checkbox'
+								id='adding'
+								defaultChecked={equationPropsObj.subtracting}
+								onChange={toggleSubtractingState}
+								disabled={startStopState === 'stop' ? false : true}
+							/>
+							<span className='slider round'></span>
+						</label>
 					</div>
 				</div>
 			</div>
@@ -179,54 +597,35 @@ const EquiationControl: FC<TimeControlPropsType> = (
 };
 
 let timerInterval: ReturnType<typeof setInterval>;
-const App: FC = () => {
+const App = (): JSX.Element => {
 	const [bgColor, setBgColor] = useState<string>('gray');
-	const [breakLength, setBrakeLength] = useState<timeControlType>({
-		id: 'break',
-		name: 'Break',
-		length: 5,
-	});
-	const [sessionLength, setSessionLength] = useState<timeControlType>({
-		id: 'session',
-		name: 'Session',
-		length: 25,
-	});
-	const [timerMinutes, setTimerMinutes] = useState<number>(25);
+	const [equationProps, setEquationProps] =
+		useState<EquationControlPropInterface>({
+			minEquationDigit: 0,
+			maxEquationDigit: 10,
+			adding: true,
+			subtracting: false,
+		});
+	const [timerMinutes, setTimerMinutes] = useState<number>(0);
 	const [timerSeconds, setTimerSeconds] = useState<number>(0);
-	const [currAction, setCurrAction] = useState<string>('Session');
 	const [startStopState, setStartStopState] = useState<string>('stop');
-	const audioHtmlEl = useRef() as MutableRefObject<HTMLAudioElement>;
-	const currAudioHtmlEL = audioHtmlEl.current;
+	const [correctAnswersNumber, setCorrectAnswersNumber] = useState<number>(0);
+	const [wrongAnswersNumber, setWrongAnswersNumber] = useState<number>(0);
 
-	const toggleCurrAction: (prevState: string) => string = (prevState) => {
-		setTimerSeconds(0);
-		if (prevState === 'Session') {
-			setTimerMinutes(breakLength.length);
-			return 'Brake';
-		} else {
-			setTimerMinutes(sessionLength.length);
-			return 'Session';
-		}
+	const minutesCounter: (prevState: number) => number = (prevState) => {
+		return prevState + 1;
 	};
 
-	const minutesContdown: (prevState: number) => number = (prevState) => {
-		if (prevState - 1 < 0) {
-			currAudioHtmlEL.play();
-			setCurrAction((prevState) => toggleCurrAction(prevState));
+	const secondsCounter: (prevState: number) => number = (prevState) => {
+		if (prevState + 1 === 60) {
+			setTimerMinutes((prevState) => minutesCounter(prevState));
 			return 0;
-		} else return prevState - 1;
-	};
-
-	const secondContdown: (prevState: number) => number = (prevState) => {
-		if (prevState - 1 < 0) {
-			setTimerMinutes((prevState) => minutesContdown(prevState));
-			return 59;
-		} else return prevState - 1;
+		} else return prevState + 1;
 	};
 
 	const startTimerHandler: () => void = () => {
 		timerInterval = setInterval(() => {
-			setTimerSeconds((prevState) => secondContdown(prevState));
+			setTimerSeconds((prevState) => secondsCounter(prevState));
 		}, 1000);
 		//timerInterval = setInterval(secondsСountdown(), 1000);
 	};
@@ -245,22 +644,9 @@ const App: FC = () => {
 	};
 
 	const refreshHandler: () => void = () => {
-		currAudioHtmlEL.pause();
-		currAudioHtmlEL.load();
 		setStartStopState('stop');
 		clearInterval(timerInterval);
-		setCurrAction('Session');
-		setSessionLength((prevState: timeControlType) => ({
-			id: prevState.id,
-			name: prevState.name,
-			length: 25,
-		}));
-		setBrakeLength((prevState: timeControlType) => ({
-			id: prevState.id,
-			name: prevState.name,
-			length: 5,
-		}));
-		setTimerMinutes(25);
+		setTimerMinutes(0);
 		setTimerSeconds(0);
 	};
 
@@ -269,57 +655,66 @@ const App: FC = () => {
 	}, []);
 	return (
 		<main
-			id="container"
-			className="vh-100 d-flex justify-content-center align-items-center elementFadeIn"
-			style={{ backgroundColor: bgColor }}>
+			id='container'
+			className='vh-100 d-flex justify-content-center align-items-center elementFadeIn'
+			style={{
+				backgroundColor: bgColor,
+				minHeight: '420px',
+			}}>
 			<div
-				id="app"
-				className="d-flex flex-column align-items-center appContainer">
-				<h2 id="firstLineTitle" style={{ width: 'max-content' }}>
+				id='app'
+				className='d-flex flex-column align-items-center appContainer'>
+				<h2
+					id='firstLineTitle'
+					style={{ width: 'max-content' }}>
 					Тренажёр арифметики.
 				</h2>
-				<h2 id="seconLineTitle" style={{ width: 'max-content' }}>
+				<h2
+					id='seconLineTitle'
+					style={{ width: 'max-content' }}>
 					Первый класс.
 				</h2>
-				<div id="controlBlock" className="d-flex">
-					<EquiationControl
-						timeControlObj={breakLength}
-						setState={setBrakeLength}
-						currAction={currAction}
+				<div
+					id='controlBlock'
+					className='d-flex'>
+					<EquationControl
+						equationPropsObj={equationProps}
+						setEquationPropsObj={setEquationProps}
 						startStopState={startStopState}
-						setTimerMinutes={setTimerMinutes}
-						setTimerSeconds={setTimerSeconds}
 					/>
 				</div>
-				<div className="d-flex flex-column align-items-center">
-					<h4 id="timer-label" style={{ width: 'max-content' }}>
-						{currAction}
-					</h4>
-					<h1 id="time-left">
-						{timerMinutes < 10 ? '0' + timerMinutes : timerMinutes}:
-						{timerSeconds < 10 ? '0' + timerSeconds : timerSeconds}
-					</h1>
-				</div>
-				<div className="d-flex flex-row">
+				{/* start_stop block */}
+				<div className='d-flex flex-row mb-3'>
 					<button
-						id="start_stop"
-						className="controlButton hoverAnimationDuration"
+						id='start_stop'
+						className='controlButton hoverAnimationDuration'
 						onClick={toggleTimerHandler}>
 						<AiOutlinePlayCircle />/
 						<AiOutlinePauseCircle />
 					</button>
 					<button
-						id="reset"
-						className="controlButton hoverAnimationDuration"
+						id='reset'
+						className='controlButton hoverAnimationDuration'
 						onClick={refreshHandler}>
 						<FiRefreshCcw />
 					</button>
 				</div>
-				<audio
-					id="beep"
-					ref={audioHtmlEl}
-					preload="auto"
-					src="https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"
+				<div className='d-flex flex-column align-items-center'>
+					<h4
+						id='timer-label'
+						style={{ width: 'max-content' }}>
+						Время после старта
+					</h4>
+					<h1 id='time-left'>
+						{timerMinutes < 10 ? '0' + timerMinutes : timerMinutes}:
+						{timerSeconds < 10 ? '0' + timerSeconds : timerSeconds}
+					</h1>
+				</div>
+				<EquationTrainer
+					equationPropsObj={equationProps}
+					startStopState={startStopState}
+					mistakesQuantity={wrongAnswersNumber}
+					correctAnswersQuantity={correctAnswersNumber}
 				/>
 			</div>
 		</main>
