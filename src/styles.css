@@ -20,12 +20,13 @@
 		opacity: 1;
 	}
 }
-.hoverAnimationDuration {
+.hoverAnimation {
 	-webkit-transition: background 1s 0s ease;
 	-moz-transition: background 1s 0s ease;
 	-o-transition: background 1s 0s ease;
 	transition: background 1s 0s ease;
 }
+
 .digitInput {
 	display: block;
 	padding: 0.375rem 0.75rem;
@@ -54,6 +55,14 @@
 	line-height: 0;
 	height: min-content;
 }
+.btnBasicStyle {
+	background-color: '#007bff';
+	border: none;
+	box-shadow: 6px 3px 2px gray;
+	font-family: 'Share Tech Mono', monospace;
+	height: 100%;
+	width: 100%;
+}
 .buttonDisableStyle {
 	color: #7a7a7a;
 	background-color: #e6e6e6;
@@ -61,13 +70,22 @@
 	margin: 0.3rem;
 	cursor: not-allowed !important;
 }
-
-.timerButton:focus,
-.controlButton:focus {
-	outline: none !important;
+.checkButton {
+	background-color: transparent;
+	border-radius: 50%;
+	border: none;
+	display: inline-block;
+	cursor: pointer;
+	color: #000000;
+	padding: 0.3rem;
+	text-decoration: none;
+	line-height: 0;
+	height: min-content;
 }
-
-.controlButton:hover {
+.timerButton:focus,
+.controlButton:focus,
+.hoverAnimation:hover {
+	outline: none !important;
 	background-color: white;
 }
 
@@ -112,7 +130,7 @@
 
 .slider:before {
 	position: absolute;
-	content: "";
+	content: '';
 	height: 16px;
 	width: 16px;
 	left: 4px;

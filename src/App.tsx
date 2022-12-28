@@ -8,7 +8,11 @@ import React, {
 	ChangeEvent,
 } from 'react';
 
-import { BsArrowUpCircle, BsArrowDownCircle } from 'react-icons/bs';
+import {
+	BsArrowUpCircle,
+	BsArrowDownCircle,
+	BsCheck2Circle,
+} from 'react-icons/bs';
 import { AiOutlinePlayCircle, AiOutlinePauseCircle } from 'react-icons/ai';
 import { FiRefreshCcw } from 'react-icons/fi';
 
@@ -52,7 +56,13 @@ type equationTrainerPropType = Omit<
 	setCorrectAnswersQuantity: Dispatch<SetStateAction<number>>;
 };
 
-//control component
+type buttonPropType = {
+	id: string;
+	num: string | number;
+	keyPressedValue: string;
+	keystrokesNumber: number;
+};
+//**********************control_component**********************************/
 const EquationControl = (props: equationControlPropsType): JSX.Element => {
 	const { equationPropsObj, setEquationPropsObj, startStopState } = props;
 
@@ -210,17 +220,18 @@ const EquationControl = (props: equationControlPropsType): JSX.Element => {
 					<div className='d-flex flex-row flex-wrap align-items-center'>
 						<div
 							id='from'
-							className='d-flex flex-column flex-wrap align-items-center'>
+							className='d-flex flex-column flex-wrap align-items-center'
+						>
 							<h4>От</h4>
 							<button
 								id='minDigitIncrement'
 								className={
 									(startStopState === 'stop'
 										? 'buttonClickAnimation '
-										: 'buttonDisableStyle ') +
-									'timerButton hoverAnimationDuration'
+										: 'buttonDisableStyle ') + 'timerButton hoverAnimation'
 								}
-								onClick={increaseMinDigit}>
+								onClick={increaseMinDigit}
+							>
 								<BsArrowUpCircle />
 							</button>
 							<input
@@ -237,26 +248,27 @@ const EquationControl = (props: equationControlPropsType): JSX.Element => {
 								className={
 									(startStopState === 'stop'
 										? 'buttonClickAnimation '
-										: 'buttonDisableStyle ') +
-									'timerButton hoverAnimationDuration'
+										: 'buttonDisableStyle ') + 'timerButton hoverAnimation'
 								}
-								onClick={decreaseMinDigit}>
+								onClick={decreaseMinDigit}
+							>
 								<BsArrowDownCircle />
 							</button>
 						</div>
 						<div
 							id='to'
-							className='d-flex flex-column flex-wrap align-items-center'>
+							className='d-flex flex-column flex-wrap align-items-center'
+						>
 							<h4 className='ms-2'>до</h4>
 							<button
 								id='maxDigitIncrement'
 								className={
 									(startStopState === 'stop'
 										? 'buttonClickAnimation '
-										: 'buttonDisableStyle ') +
-									'timerButton hoverAnimationDuration'
+										: 'buttonDisableStyle ') + 'timerButton hoverAnimation'
 								}
-								onClick={increaseMaxDigit}>
+								onClick={increaseMaxDigit}
+							>
 								<BsArrowUpCircle />
 							</button>
 							<input
@@ -273,10 +285,10 @@ const EquationControl = (props: equationControlPropsType): JSX.Element => {
 								className={
 									(startStopState === 'stop'
 										? 'buttonClickAnimation '
-										: 'buttonDisableStyle ') +
-									'timerButton hoverAnimationDuration'
+										: 'buttonDisableStyle ') + 'timerButton hoverAnimation'
 								}
-								onClick={decreaseMaxDigit}>
+								onClick={decreaseMaxDigit}
+							>
 								<BsArrowDownCircle />
 							</button>
 						</div>
@@ -287,7 +299,8 @@ const EquationControl = (props: equationControlPropsType): JSX.Element => {
 					<div className='d-flex flex-column flex-wrap align-items-center m-2'>
 						<label
 							className='h4'
-							htmlFor='adding'>
+							htmlFor='adding'
+						>
 							Сложение (+)
 						</label>
 						<label className='switch ms-2'>
@@ -304,7 +317,8 @@ const EquationControl = (props: equationControlPropsType): JSX.Element => {
 					<div className='d-flex flex-column flex-wrap align-items-center m-2'>
 						<label
 							className='h4'
-							htmlFor='adding'>
+							htmlFor='adding'
+						>
 							Вычитание (-)
 						</label>
 						<label className='switch ms-2'>
@@ -324,36 +338,313 @@ const EquationControl = (props: equationControlPropsType): JSX.Element => {
 	);
 };
 
-//equation trainer component
+//**********************equation_trainer_component*************************/
 const EquationTrainer = (props: equationTrainerPropType): JSX.Element => {
-	const { equationPropsObj, startStopState, setMistakesQuantity, setCorrectAnswersQuantity } = props;
+	const {
+		equationPropsObj,
+		startStopState,
+		setMistakesQuantity,
+		setCorrectAnswersQuantity,
+	} = props;
+	const maxDigit = equationPropsObj.maxEquationDigit;
+	const minDigit = equationPropsObj.minEquationDigit;
+	const randomFirstDigit =
+		Math.floor(Math.random() * (maxDigit - minDigit + 1)) + minDigit;
+	const randomSecondDigit =
+		Math.floor(Math.random() * (maxDigit - minDigit + 1)) + minDigit;
+
+	const randomArithmeticOperator: () => string = () => {
+		const operatorsArr: string[] = [];
+		if (equationPropsObj.adding) {
+			operatorsArr.push('+');
+		}
+		if (equationPropsObj.subtracting) {
+			operatorsArr.push('-');
+		}
+		// console.log(operatorsArr.length)
+		if (operatorsArr.length > 1) {
+			return operatorsArr[Math.round(Math.random())];
+		} else {
+			return operatorsArr[0];
+		}
+	};
 
 	return (
 		<div className='d-flex flex-column align-items-center mx-3'>
-			<h3 className='text-center'>Выберите опции</h3>
+			<h3 className='text-center'>Пример:</h3>
 			<div className='d-flex flex-row'>
 				<div className='d-flex flex-row align-items-center mx-3'>
-					<h4>Диапазон чисел:</h4>
-					<div className='d-flex flex-row flex-wrap align-items-center'>
-						<div
-							id='from'
-							className='d-flex flex-column flex-wrap align-items-center'>
-							<h4>От</h4>
-							
-						</div>
-						<div
-							id='to'
-							className='d-flex flex-column flex-wrap align-items-center'>
-							<h4 className='ms-2'>до</h4>
-							
-						</div>
-					</div>
-				</div>	
+					<h1>{randomFirstDigit}</h1>
+					<h1>{randomArithmeticOperator()}</h1>
+					<h1>{randomSecondDigit}</h1>
+					<h1>=</h1>
+					<h1>?</h1>
+					<button
+						id='minDigitIncrement'
+						className={
+							(startStopState === 'stop'
+								? 'buttonClickAnimation '
+								: 'buttonDisableStyle ') + 'checkButton hoverAnimation m-1 h1'
+						}
+						// onClick={increaseMinDigit}
+					>
+						<BsCheck2Circle />
+					</button>
+				</div>
 			</div>
 		</div>
 	);
 };
 
+//**********************button_component***********************************/
+const ButtonComponent = (props: buttonPropType): JSX.Element => {
+	const { id, num, keyPressedValue, keystrokesNumber } = props;
+
+	const [buttonStateStyle, setButtonStyle] = useState<string>();
+
+	//console.log(keySound.volume);
+	const padPressed = () => {
+		setButtonStyle('btnActiveStyle');
+		setTimeout(() => setButtonStyle('btnEnableStyle'), 150);
+	};
+	//console.log(keyTrigger + " button rendered");
+	const handelKeyPress: (keyPressCode: string | number) => void = (
+		keyPressCode,
+	) => {
+		//console.log(keyPressCode);
+
+		if (keyPressCode === 'Enter' && num === '=') {
+			padPressed();
+		} else if (keyPressCode === 'Escape' && num === 'ACC') {
+			padPressed();
+		} else if (keyPressCode === '*' && num === 'X') {
+			padPressed();
+		} else if (
+			typeof keyPressCode === 'number'
+				? Number(keyPressCode) === num
+				: keyPressCode
+		) {
+			padPressed();
+		}
+	};
+
+	useEffect(() => {
+		handelKeyPress(keyPressedValue);
+	}, [keyPressedValue, keystrokesNumber]);
+	return (
+		<button
+			id={id}
+			className={
+				'btn-lg flex-fill btn btn-primary btnBasicStyle ' + buttonStateStyle
+			}
+			onClick={padPressed}
+		>
+			{num}
+		</button>
+	);
+};
+//**********************buttons_panel_component****************************/
+const ButtonsPanel = (props: {
+	keyPressedValue: string;
+	keystrokesNumber: number;
+}): JSX.Element => {
+	//console.log("ButtonsPanel component rendered");
+	const { keyPressedValue, keystrokesNumber } = props;
+
+	const numberPicker = new RegExp('^[0-9]*$');
+	const dotPicker = /\./i;
+
+	const [equationObj, setEquationObj] = useState({
+		equationArr: [0],
+		activeArrayElement: 0,
+		formulaCalculated: false,
+	});
+
+	return (
+		<div
+			id='buttonsPanel'
+			className='mx-1 row'
+		>
+			<div className='col-6 col'>
+				<div className='calcButtonsRow row'>
+					<div className='col-12 p-1 col'>
+						<ButtonComponent
+							id='clear'
+							num={'ACC'}
+							keyPressedValue={keyPressedValue}
+							keystrokesNumber={keystrokesNumber}
+						/>
+					</div>
+				</div>
+				<div className='calcButtonsRow row'>
+					<div className='col-6 p-1 col'>
+						<ButtonComponent
+							id={'seven'}
+							num={'7'}
+							keyPressedValue={keyPressedValue}
+							keystrokesNumber={keystrokesNumber}
+						/>
+					</div>
+					<div className='col-6 p-1 col'>
+						<ButtonComponent
+							id={'eight'}
+							num={'8'}
+							keyPressedValue={keyPressedValue}
+							keystrokesNumber={keystrokesNumber}
+						/>
+					</div>
+				</div>
+				<div className='calcButtonsRow row'>
+					<div className='col-6 p-1 col'>
+						<ButtonComponent
+							id={'four'}
+							num={'4'}
+							keyPressedValue={keyPressedValue}
+							keystrokesNumber={keystrokesNumber}
+						/>
+					</div>
+					<div className='col-6 p-1 col'>
+						<ButtonComponent
+							id={'five'}
+							num={'5'}
+							keyPressedValue={keyPressedValue}
+							keystrokesNumber={keystrokesNumber}
+						/>
+					</div>
+				</div>
+				<div className='calcButtonsRow row'>
+					<div className='col-6 p-1 col'>
+						<ButtonComponent
+							id={'one'}
+							num={'1'}
+							keyPressedValue={keyPressedValue}
+							keystrokesNumber={keystrokesNumber}
+						/>
+					</div>
+					<div className='col-6 p-1 col'>
+						<ButtonComponent
+							id={'two'}
+							num={'2'}
+							keyPressedValue={keyPressedValue}
+							keystrokesNumber={keystrokesNumber}
+						/>
+					</div>
+				</div>
+				<div className='calcButtonsRow row'>
+					<div className='col-12 p-1 col'>
+						<ButtonComponent
+							num={0}
+							id={'zero'}
+							keyPressedValue={keyPressedValue}
+							keystrokesNumber={keystrokesNumber}
+						/>
+					</div>
+				</div>
+			</div>
+			<div className='col-3 col'>
+				<div className='calcButtonsRow row'>
+					<div className='p-1 col'>
+						<ButtonComponent
+							id='divide'
+							num={'/'}
+							keyPressedValue={keyPressedValue}
+							keystrokesNumber={keystrokesNumber}
+						/>
+					</div>
+				</div>
+				<div className='calcButtonsRow row'>
+					<div className='p-1 col'>
+						<ButtonComponent
+							id={'nine'}
+							num={9}
+							keyPressedValue={keyPressedValue}
+							keystrokesNumber={keystrokesNumber}
+						/>
+					</div>
+				</div>
+				<div className='calcButtonsRow row'>
+					<div className='p-1 col'>
+						<ButtonComponent
+							id={'six'}
+							num={6}
+							keyPressedValue={keyPressedValue}
+							keystrokesNumber={keystrokesNumber}
+						/>
+					</div>
+				</div>
+				<div className='calcButtonsRow row'>
+					<div className='p-1 col'>
+						<ButtonComponent
+							id={'three'}
+							num={3}
+							keyPressedValue={keyPressedValue}
+							keystrokesNumber={keystrokesNumber}
+						/>
+					</div>
+				</div>
+				<div className='calcButtonsRow row'>
+					<div className='p-1 col'>
+						<ButtonComponent
+							id='decimal'
+							num={'.'}
+							keyPressedValue={keyPressedValue}
+							keystrokesNumber={keystrokesNumber}
+						/>
+					</div>
+				</div>
+			</div>
+			<div className='col-3 col'>
+				<div className='calcButtonsRow row'>
+					<div className='p-1 col'>
+						<ButtonComponent
+							id='multiply'
+							num={'X'}
+							keyPressedValue={keyPressedValue}
+							keystrokesNumber={keystrokesNumber}
+						/>
+					</div>
+				</div>
+				<div className='calcButtonsRow row'>
+					<div className='p-1 col'>
+						<ButtonComponent
+							id='add'
+							num={'+'}
+							keyPressedValue={keyPressedValue}
+							keystrokesNumber={keystrokesNumber}
+						/>
+					</div>
+				</div>
+				<div className='calcButtonsRow row'>
+					<div className='p-1 col'>
+						<ButtonComponent
+							id='subtract'
+							num={'-'}
+							keyPressedValue={keyPressedValue}
+							keystrokesNumber={keystrokesNumber}
+						/>
+					</div>
+				</div>
+				<div className='row'>
+					<div
+						className='p-1 col'
+						style={{
+							height: '120px',
+						}}
+					>
+						<ButtonComponent
+							id={'equals'}
+							num={'='}
+							keyPressedValue={keyPressedValue}
+							keystrokesNumber={keystrokesNumber}
+						/>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+};
+
+//**********************main_app*******************************************/
 let timerInterval: ReturnType<typeof setInterval>;
 const App = (): JSX.Element => {
 	const [bgColor, setBgColor] = useState<string>('gray');
@@ -417,24 +708,29 @@ const App = (): JSX.Element => {
 			className='vh-100 d-flex justify-content-center align-items-center elementFadeIn'
 			style={{
 				backgroundColor: bgColor,
-				minHeight: '420px',
-			}}>
+				minHeight: '1200px',
+			}}
+		>
 			<div
 				id='app'
-				className='d-flex flex-column align-items-center appContainer'>
+				className='d-flex flex-column align-items-center appContainer'
+			>
 				<h2
 					id='firstLineTitle'
-					style={{ width: 'max-content' }}>
+					style={{ width: 'max-content' }}
+				>
 					Тренажёр арифметики.
 				</h2>
 				<h2
 					id='seconLineTitle'
-					style={{ width: 'max-content' }}>
+					style={{ width: 'max-content' }}
+				>
 					Первый класс.
 				</h2>
 				<div
 					id='controlBlock'
-					className='d-flex'>
+					className='d-flex'
+				>
 					<EquationControl
 						equationPropsObj={equationProps}
 						setEquationPropsObj={setEquationProps}
@@ -445,58 +741,59 @@ const App = (): JSX.Element => {
 				<div className='d-flex flex-row mb-3'>
 					<button
 						id='start_stop'
-						className='controlButton hoverAnimationDuration'
-						onClick={toggleTimerHandler}>
+						className='controlButton hoverAnimation'
+						onClick={toggleTimerHandler}
+					>
 						<AiOutlinePlayCircle />/
 						<AiOutlinePauseCircle />
 					</button>
 					<button
 						id='reset'
-						className='controlButton hoverAnimationDuration'
-						onClick={refreshHandler}>
+						className='controlButton hoverAnimation'
+						onClick={refreshHandler}
+					>
 						<FiRefreshCcw />
 					</button>
 				</div>
-				<div className="d-flex flex-row flex-wrap align-items-center justify-content-center">
-					<div className='d-flex flex-column align-items-center'>
+				<div className='d-flex flex-row flex-wrap align-items-center justify-content-center'>
+					<div className='d-flex flex-column align-items-center mx-3'>
 						<h4
 							id='timer-label'
-							style={{ width: 'max-content' }}>
-							Время после старта
-						</h4>
-						<h1 id='time-left'>
-							{timerMinutes < 10 ? '0' + timerMinutes : timerMinutes}:
-							{timerSeconds < 10 ? '0' + timerSeconds : timerSeconds}
-						</h1>
-					</div>
-					<div className='d-flex flex-column align-items-center'>
-						<h4
-							id='timer-label'
-							style={{ width: 'max-content' }}>
-							Число верных ответов:
-						</h4>
-						<h1 id='time-left'>
-							{correctAnswersNumber}
-						</h1>
-					</div>
-					<div className='d-flex flex-column align-items-center'>
-						<h4
-							id='timer-label'
-							style={{ width: 'max-content' }}>
+							style={{ width: 'max-content' }}
+						>
 							Число неверных ответов:
 						</h4>
-						<h1 id='time-left'>
-							{wrongAnswersNumber}
-						</h1>
+						<h1 id='time-left'>{wrongAnswersNumber}</h1>
+					</div>
+					<div className='d-flex flex-column align-items-center mx-3'>
+						<h4
+							id='timer-label'
+							style={{ width: 'max-content' }}
+						>
+							Число верных ответов:
+						</h4>
+						<h1 id='time-left'>{correctAnswersNumber}</h1>
 					</div>
 				</div>
-				
+				<div className='d-flex flex-column align-items-center'>
+					<h4
+						id='timer-label'
+						style={{ width: 'max-content' }}
+					>
+						Время после старта
+					</h4>
+					<h1 id='time-left'>
+						{timerMinutes < 10 ? '0' + timerMinutes : timerMinutes}:
+						{timerSeconds < 10 ? '0' + timerSeconds : timerSeconds}
+					</h1>
+				</div>
 				<EquationTrainer
 					equationPropsObj={equationProps}
 					startStopState={startStopState}
 					setMistakesQuantity={setCorrectAnswersNumber}
 					setCorrectAnswersQuantity={setWrongAnswersNumber}
 				/>
+				<ButtonsPanel />
 			</div>
 		</main>
 	);
