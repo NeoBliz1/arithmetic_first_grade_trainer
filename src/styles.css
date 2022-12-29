@@ -55,20 +55,35 @@
 	line-height: 0;
 	height: min-content;
 }
-.btnBasicStyle {
+.padStyle {
 	background-color: '#007bff';
 	border: none;
 	box-shadow: 6px 3px 2px gray;
 	font-family: 'Share Tech Mono', monospace;
-	height: 100%;
+	height: 90px;
 	width: 100%;
 }
-.buttonDisableStyle {
-	color: #7a7a7a;
-	background-color: #e6e6e6;
-	padding: 0;
-	margin: 0.3rem;
-	cursor: not-allowed !important;
+.padStyleInactive {
+	background-color: #ccc;
+}
+.padStyleInactive:is(:active, :hover, :focus) {
+	background-color: #ccc !important;
+	border-color: var#ccc !important;
+}
+.padStyleActive {
+	background-color: #007bff;
+	border-color: #007bff;
+}
+.padStylePressed {
+	color: black;
+	background-color: yellow;
+	box-shadow: none;
+}
+.padStylePressed:is(:active, :hover, :focus),
+.padStyleActive:active {
+	color: black;
+	background-color: yellow;
+	border-color: yellow;
 }
 .checkButton {
 	background-color: transparent;
@@ -163,8 +178,8 @@ input:checked + .slider:before {
 	border-radius: 50%;
 }
 
-@media screen and (max-width: 43rem) {
+/* @media screen and (max-width: 43rem) {
 	#app {
 		transform: scale(0.8);
 	}
-}
+} */
