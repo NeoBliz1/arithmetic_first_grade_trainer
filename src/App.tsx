@@ -380,13 +380,8 @@ const EquationTrainer = (props: equationTrainerPropType): JSX.Element => {
 					randomSecondDigit.toString(),
 			);
 		};
-		console.log(padPanelPropsObj.answerArr);
 		console.log(
-			eval(
-				randomFirstDigit.toString() +
-					randomArithmeticOperator +
-					randomSecondDigit.toString(),
-			),
+			parseInt(padPanelPropsObj.answerArr.join('')) === calculateAnswer(),
 		);
 		//create new equation
 		const maxDigit = equationPropsObj.maxEquationDigit;
@@ -398,7 +393,7 @@ const EquationTrainer = (props: equationTrainerPropType): JSX.Element => {
 			Math.floor(Math.random() * (maxDigit - minDigit + 1)) + minDigit,
 		);
 
-		const randomArithmeticOperator: () => string = () => {
+		const randomArithmeticOperatorGeneretor: () => string = () => {
 			const operatorsArr: string[] = [];
 			if (equationPropsObj.adding) {
 				operatorsArr.push('+');
@@ -413,7 +408,7 @@ const EquationTrainer = (props: equationTrainerPropType): JSX.Element => {
 				return operatorsArr[0];
 			}
 		};
-		setRandomArithmeticOperator(randomArithmeticOperator());
+		setRandomArithmeticOperator(randomArithmeticOperatorGeneretor());
 	}, [padPanelPropsObj.attempsNumber]);
 
 	return (
@@ -468,11 +463,30 @@ const ButtonComponent = (props: buttonPropType): JSX.Element => {
 			//check in not undefined
 			if (event.currentTarget.dataset.num) {
 				currNum = event.currentTarget.dataset.num;
-				if (currNum === 'ACC') {
+				if (currNum === 'check') {
 					setPadPanelProps((prevState) => ({
 						...prevState,
 						attempsNumber: prevState.attempsNumber + 1,
 					}));
+				} else if (currNum === 'del') {
+					setPadPanelProps((prevState) => {
+						// console.log([...prevState.answerArr]);
+						if (prevState.answerArr.length === 0) {
+							return prevState;
+						} else {
+							//copy original array
+							const copyArray = [...prevState.answerArr];
+							//remove last element from copyArray
+							copyArray.pop();
+							// console.log(copyArray);
+							if (copyArray) {
+								return {
+									...prevState,
+									answerArr: copyArray,
+								};
+							} else return prevState;
+						}
+					});
 				} else {
 					setPadPanelProps((prevState) => ({
 						...prevState,
@@ -493,7 +507,7 @@ const ButtonComponent = (props: buttonPropType): JSX.Element => {
 		// console.log(keyPressCode);
 		// console.log(Number(keyPressCode) === num);
 
-		if (keyPressCode === 'Enter' && num === 'ACC') {
+		if (keyPressCode === 'Enter' && num === 'check') {
 			// padPressed();
 		} else if (keyPressCode === num) {
 			// padPressed();
@@ -513,10 +527,10 @@ const ButtonComponent = (props: buttonPropType): JSX.Element => {
 			}
 			onClick={padPressed}
 		>
-			{num !== 'ACC' ? (
+			{num !== 'check' ? (
 				<p className='m-0 fs-2'>{num}</p>
 			) : (
-				<p className='m-0 fs-2'>
+				<p className='m-0 fs-3'>
 					Проверить
 					<BsCheck2Circle />
 				</p>
@@ -553,10 +567,20 @@ const ButtonsPanel = (props: buttonsPanelPropType): JSX.Element => {
 			style={{ width: '320px' }}
 		>
 			<div className='calcButtonsRow row'>
-				<div className='col-12 p-1 col'>
+				<div className='col-8 p-1 col'>
 					<ButtonComponent
 						id='checkAnswer'
-						num={'ACC'}
+						num={'check'}
+						keyPressedValue={keyPressedValue}
+						keystrokesNumber={keystrokesNumber}
+						startStopState={startStopState}
+						setPadPanelProps={setPadPanelProps}
+					/>
+				</div>
+				<div className='col-4 p-1 col'>
+					<ButtonComponent
+						id='del'
+						num={'del'}
 						keyPressedValue={keyPressedValue}
 						keystrokesNumber={keystrokesNumber}
 						startStopState={startStopState}

@@ -55,12 +55,15 @@
 	height: min-content;
 }
 .padStyle {
-	background-color: '#007bff';
+	background-color: #007bff;
 	border: none;
 	box-shadow: 6px 3px 2px gray;
 	font-family: 'Share Tech Mono', monospace;
 	height: 90px;
 	width: 100%;
+}
+#del.padStyleActive {
+	background-color: #ff0000;
 }
 .padStyleInactive {
 	background-color: #ccc;
