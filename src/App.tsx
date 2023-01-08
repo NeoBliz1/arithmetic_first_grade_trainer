@@ -62,6 +62,7 @@ type equationTrainerPropType = Omit<
 	setMistakesQuantity: Dispatch<SetStateAction<number>>;
 	setCorrectAnswersQuantity: Dispatch<SetStateAction<number>>;
 	padPanelPropsObj: PadPanelPropsInterface;
+	setPadPanelProps: setPadPanelPropsType;
 };
 type keyPressedValueType = string | undefined;
 type keystrokesNumberType = number;
@@ -361,6 +362,7 @@ const EquationTrainer = (props: equationTrainerPropType): JSX.Element => {
 		setMistakesQuantity,
 		setCorrectAnswersQuantity,
 		padPanelPropsObj,
+		setPadPanelProps,
 	} = props;
 	const [randomFirstDigit, setRandomFirstDigit] = useState<number>(
 		equationPropsObj.minEquationDigit,
@@ -370,50 +372,107 @@ const EquationTrainer = (props: equationTrainerPropType): JSX.Element => {
 	);
 	const [randomArithmeticOperator, setRandomArithmeticOperator] =
 		useState<string>('+');
+	const [answerState, setAnswerState] = useState<string>('zero');
+
+	//generate operator
+	const randomArithmeticOperatorGeneretor: () => string = () => {
+		const operatorsArr: string[] = [];
+		if (equationPropsObj.adding) {
+			operatorsArr.push('+');
+		}
+		if (equationPropsObj.subtracting) {
+			operatorsArr.push('-');
+		}
+		// console.log(operatorsArr.length)
+		if (operatorsArr.length > 1) {
+			return operatorsArr[Math.round(Math.random())];
+		} else {
+			return operatorsArr[0];
+		}
+	};
 
 	useEffect(() => {
-		//check answer
-		const calculateAnswer = () => {
-			return eval(
-				randomFirstDigit.toString() +
-					randomArithmeticOperator +
-					randomSecondDigit.toString(),
-			);
-		};
-		console.log(
-			parseInt(padPanelPropsObj.answerArr.join('')) === calculateAnswer(),
-		);
-		//create new equation
-		const maxDigit = equationPropsObj.maxEquationDigit;
-		const minDigit = equationPropsObj.minEquationDigit;
-		setRandomFirstDigit(
-			Math.floor(Math.random() * (maxDigit - minDigit + 1)) + minDigit,
-		);
-		setRandomSecondDigit(
-			Math.floor(Math.random() * (maxDigit - minDigit + 1)) + minDigit,
-		);
+		//generate new equation and check answer if starting
+		if (startStopState === 'start') {
+			//calculate answer
+			const calculateAnswer = () => {
+				return eval(
+					randomFirstDigit.toString() +
+						randomArithmeticOperator +
+						randomSecondDigit.toString(),
+				);
+			};
 
-		const randomArithmeticOperatorGeneretor: () => string = () => {
-			const operatorsArr: string[] = [];
-			if (equationPropsObj.adding) {
-				operatorsArr.push('+');
-			}
-			if (equationPropsObj.subtracting) {
-				operatorsArr.push('-');
-			}
-			// console.log(operatorsArr.length)
-			if (operatorsArr.length > 1) {
-				return operatorsArr[Math.round(Math.random())];
+			//comparig answers
+			// console.log(parseInt(padPanelPropsObj.answerArr.join('')));
+			// console.log(calculateAnswer());
+			if (parseInt(padPanelPropsObj.answerArr.join('')) === calculateAnswer()) {
+				setCorrectAnswersQuantity((prevState) => prevState + 1);
+				setAnswerState('correct');
 			} else {
-				return operatorsArr[0];
+				setMistakesQuantity((prevState) => prevState + 1);
+				setAnswerState('wrong');
 			}
-		};
-		setRandomArithmeticOperator(randomArithmeticOperatorGeneretor());
+			// console.log(answerState);
+			const timer = setTimeout(() => {
+				setAnswerState('zero');
+			}, 1000);
+			//clear current answer
+			setPadPanelProps((prevState) => ({
+				...prevState,
+				answerArr: [] as string[],
+			}));
+			//create new equation
+			const maxDigit = equationPropsObj.maxEquationDigit;
+			const minDigit = equationPropsObj.minEquationDigit;
+			setRandomFirstDigit(
+				Math.floor(Math.random() * (maxDigit - minDigit + 1)) + minDigit,
+			);
+			setRandomSecondDigit(
+				Math.floor(Math.random() * (maxDigit - minDigit + 1)) + minDigit,
+			);
+
+			setRandomArithmeticOperator(randomArithmeticOperatorGeneretor());
+			return () => clearTimeout(timer);
+		}
 	}, [padPanelPropsObj.attempsNumber]);
+
+	useEffect(() => {
+		//generate new equation and check answer if starting
+		if (startStopState === 'start') {
+			//clear current answer
+			setPadPanelProps((prevState) => ({
+				...prevState,
+				answerArr: [] as string[],
+			}));
+			//create new equation
+			const maxDigit = equationPropsObj.maxEquationDigit;
+			const minDigit = equationPropsObj.minEquationDigit;
+			setRandomFirstDigit(
+				Math.floor(Math.random() * (maxDigit - minDigit + 1)) + minDigit,
+			);
+			setRandomSecondDigit(
+				Math.floor(Math.random() * (maxDigit - minDigit + 1)) + minDigit,
+			);
+
+			setRandomArithmeticOperator(randomArithmeticOperatorGeneretor());
+		}
+	}, [startStopState]);
 
 	return (
 		<div className='d-flex flex-column align-items-center mx-3'>
-			<h3 className='text-center'>Пример:</h3>
+			{}
+			<h3 className='text-center'>
+				{answerState === 'correct' ? (
+					<span>
+						Молодец <BsCheck2Circle />
+					</span>
+				) : answerState === 'wrong' ? (
+					'Не верно'
+				) : (
+					'Пример:'
+				)}
+			</h3>
 			<div className='d-flex flex-row'>
 				<div className='d-flex flex-row align-items-center mx-3'>
 					<h1>{randomFirstDigit}</h1>
@@ -421,9 +480,6 @@ const EquationTrainer = (props: equationTrainerPropType): JSX.Element => {
 					<h1>{randomSecondDigit}</h1>
 					<h1>=</h1>
 					<h1>{padPanelPropsObj.answerArr}</h1>
-					<h1 className='ms-3'>
-						<BsCheck2Circle />
-					</h1>
 				</div>
 			</div>
 		</div>
@@ -794,6 +850,8 @@ const App = (): JSX.Element => {
 		clearInterval(timerInterval);
 		setTimerMinutes(0);
 		setTimerSeconds(0);
+		setWrongAnswersNumber(0);
+		setCorrectAnswersNumber(0);
 	};
 
 	//focus on the app's div for keyDown react listner
@@ -897,9 +955,10 @@ const App = (): JSX.Element => {
 				<EquationTrainer
 					equationPropsObj={equationProps}
 					startStopState={startStopState}
-					setMistakesQuantity={setCorrectAnswersNumber}
-					setCorrectAnswersQuantity={setWrongAnswersNumber}
+					setMistakesQuantity={setWrongAnswersNumber}
+					setCorrectAnswersQuantity={setCorrectAnswersNumber}
 					padPanelPropsObj={padPanelProps}
+					setPadPanelProps={setPadPanelProps}
 				/>
 				<ButtonsPanel
 					keyPressedValue={keyPressedValue}
