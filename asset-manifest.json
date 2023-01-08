@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.css": "/arithmetic_trainer_1st_grade/static/css/main.d765f605.css",
-    "main.js": "/arithmetic_trainer_1st_grade/static/js/main.787a6c15.js",
-    "index.html": "/arithmetic_trainer_1st_grade/index.html",
-    "main.d765f605.css.map": "/arithmetic_trainer_1st_grade/static/css/main.d765f605.css.map",
-    "main.787a6c15.js.map": "/arithmetic_trainer_1st_grade/static/js/main.787a6c15.js.map"
+    "main.css": "/arithmetic_first_grade_trainer/static/css/main.d765f605.css",
+    "main.js": "/arithmetic_first_grade_trainer/static/js/main.787a6c15.js",
+    "index.html": "/arithmetic_first_grade_trainer/index.html",
+    "main.d765f605.css.map": "/arithmetic_first_grade_trainer/static/css/main.d765f605.css.map",
+    "main.787a6c15.js.map": "/arithmetic_first_grade_trainer/static/js/main.787a6c15.js.map"
   },
   "entrypoints": [
     "static/css/main.d765f605.css",
