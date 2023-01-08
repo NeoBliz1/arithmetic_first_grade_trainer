@@ -15,6 +15,8 @@ import {
 	BsArrowUpCircle,
 	BsArrowDownCircle,
 	BsCheck2Circle,
+	BsFillBackspaceFill,
+	BsXCircle,
 } from 'react-icons/bs';
 import { AiOutlinePlayCircle, AiOutlinePauseCircle } from 'react-icons/ai';
 import { FiRefreshCcw } from 'react-icons/fi';
@@ -44,6 +46,11 @@ interface EquationControlPropInterface {
 interface PadPanelPropsInterface {
 	answerArr: string[];
 	attempsNumber: number;
+	prevEquiations: PrevEquationObjInterface[];
+}
+interface PrevEquationObjInterface {
+	prevEquation: string;
+	answerStatus: string;
 }
 type setEquationPropsType = Dispatch<
 	SetStateAction<EquationControlPropInterface>
@@ -76,6 +83,7 @@ type buttonPropType = {
 	setPadPanelProps: setPadPanelPropsType;
 };
 type buttonsPanelPropType = Omit<buttonPropType, 'id' | 'num'> & {
+	padPanelPropsObj: PadPanelPropsInterface;
 	setPadPanelProps: setPadPanelPropsType;
 };
 //**********************control_component**********************************/
@@ -406,33 +414,53 @@ const EquationTrainer = (props: equationTrainerPropType): JSX.Element => {
 			//comparig answers
 			// console.log(parseInt(padPanelPropsObj.answerArr.join('')));
 			// console.log(calculateAnswer());
+			let currAnswerStatus = '';
 			if (parseInt(padPanelPropsObj.answerArr.join('')) === calculateAnswer()) {
 				setCorrectAnswersQuantity((prevState) => prevState + 1);
-				setAnswerState('correct');
+				currAnswerStatus = 'correct';
 			} else {
 				setMistakesQuantity((prevState) => prevState + 1);
-				setAnswerState('wrong');
+				currAnswerStatus = 'wrong';
 			}
-			// console.log(answerState);
-			const timer = setTimeout(() => {
-				setAnswerState('zero');
-			}, 1000);
-			//clear current answer
+			setAnswerState(currAnswerStatus);
+			//add equation to array
 			setPadPanelProps((prevState) => ({
 				...prevState,
-				answerArr: [] as string[],
+				prevEquiations: [
+					...prevState.prevEquiations,
+					{
+						prevEquation:
+							randomFirstDigit.toString() +
+							randomArithmeticOperator +
+							randomSecondDigit.toString() +
+							'=' +
+							(isNaN(parseInt(padPanelPropsObj.answerArr.join('')))
+								? ''
+								: parseInt(padPanelPropsObj.answerArr.join(''))),
+						answerStatus: currAnswerStatus,
+					},
+				],
 			}));
-			//create new equation
-			const maxDigit = equationPropsObj.maxEquationDigit;
-			const minDigit = equationPropsObj.minEquationDigit;
-			setRandomFirstDigit(
-				Math.floor(Math.random() * (maxDigit - minDigit + 1)) + minDigit,
-			);
-			setRandomSecondDigit(
-				Math.floor(Math.random() * (maxDigit - minDigit + 1)) + minDigit,
-			);
+			console.log(padPanelPropsObj.prevEquiations);
+			const timer = setTimeout(() => {
+				setAnswerState('zero');
+				//clear current answer
+				setPadPanelProps((prevState) => ({
+					...prevState,
+					answerArr: [] as string[],
+				}));
+				//create new equation
+				const maxDigit = equationPropsObj.maxEquationDigit;
+				const minDigit = equationPropsObj.minEquationDigit;
+				setRandomFirstDigit(
+					Math.floor(Math.random() * (maxDigit - minDigit + 1)) + minDigit,
+				);
+				setRandomSecondDigit(
+					Math.floor(Math.random() * (maxDigit - minDigit + 1)) + minDigit,
+				);
+				setRandomArithmeticOperator(randomArithmeticOperatorGeneretor());
+			}, 1000);
 
-			setRandomArithmeticOperator(randomArithmeticOperatorGeneretor());
 			return () => clearTimeout(timer);
 		}
 	}, [padPanelPropsObj.attempsNumber]);
@@ -460,20 +488,36 @@ const EquationTrainer = (props: equationTrainerPropType): JSX.Element => {
 	}, [startStopState]);
 
 	return (
-		<div className='d-flex flex-column align-items-center mx-3'>
-			{}
+		<div
+			style={{
+				backgroundColor:
+					answerState === 'correct'
+						? 'green'
+						: answerState === 'wrong'
+						? 'red'
+						: '',
+			}}
+			className='d-flex flex-column align-items-center mx-3 rounded p-2'
+		>
 			<h3 className='text-center'>
 				{answerState === 'correct' ? (
-					<span>
+					<span className='alertFadeIn'>
 						Молодец <BsCheck2Circle />
 					</span>
 				) : answerState === 'wrong' ? (
-					'Не верно'
+					<span className='alertFadeIn'>
+						Не верно
+						<BsXCircle />
+					</span>
 				) : (
-					'Пример:'
+					<span className='alertFadeIn1'>Пример:</span>
 				)}
 			</h3>
-			<div className='d-flex flex-row'>
+			<div
+				className={
+					'd-flex flex-row ' + (answerState === 'zero' && 'alertFadeIn')
+				}
+			>
 				<div className='d-flex flex-row align-items-center mx-3'>
 					<h1>{randomFirstDigit}</h1>
 					<h1>{randomArithmeticOperator}</h1>
@@ -583,13 +627,17 @@ const ButtonComponent = (props: buttonPropType): JSX.Element => {
 			}
 			onClick={padPressed}
 		>
-			{num !== 'check' ? (
-				<p className='m-0 fs-2'>{num}</p>
-			) : (
+			{num === 'check' ? (
 				<p className='m-0 fs-3'>
 					Проверить
 					<BsCheck2Circle />
 				</p>
+			) : num === 'del' ? (
+				<p className='m-0 fs-2'>
+					<BsFillBackspaceFill />
+				</p>
+			) : (
+				<p className='m-0 fs-2'>{num}</p>
 			)}
 		</button>
 	);
@@ -602,6 +650,7 @@ const ButtonsPanel = (props: buttonsPanelPropType): JSX.Element => {
 		keyPressedValue,
 		keystrokesNumber,
 		startStopState,
+		padPanelPropsObj,
 		setPadPanelProps,
 	} = props;
 
@@ -776,6 +825,32 @@ const ButtonsPanel = (props: buttonsPanelPropType): JSX.Element => {
 					</div>
 				</div>
 			</div>
+			{
+				<div id='oldEquiatonsList'>
+					<h3
+						className={
+							padPanelPropsObj.prevEquiations.length === 0 ? 'hidden' : ''
+						}
+					>
+						Результыты решений:
+					</h3>
+					{padPanelPropsObj.prevEquiations.map((el, i) => {
+						return (
+							<h3 key={i + 1}>
+								Пример {' ' + i + ': '}{' '}
+								<span
+									style={{
+										backgroundColor:
+											el.answerStatus === 'correct' ? 'green' : 'red',
+									}}
+								>
+									{el.prevEquation}
+								</span>
+							</h3>
+						);
+					})}
+				</div>
+			}
 		</div>
 	);
 };
@@ -794,6 +869,7 @@ const App = (): JSX.Element => {
 	const [padPanelProps, setPadPanelProps] = useState<PadPanelPropsInterface>({
 		answerArr: [] as string[],
 		attempsNumber: 0,
+		prevEquiations: [] as PrevEquationObjInterface[],
 	});
 	const [timerMinutes, setTimerMinutes] = useState<number>(0);
 	const [timerSeconds, setTimerSeconds] = useState<number>(0);
@@ -852,6 +928,12 @@ const App = (): JSX.Element => {
 		setTimerSeconds(0);
 		setWrongAnswersNumber(0);
 		setCorrectAnswersNumber(0);
+		//add equation to array
+		setPadPanelProps({
+			answerArr: [] as string[],
+			attempsNumber: 0,
+			prevEquiations: [],
+		});
 	};
 
 	//focus on the app's div for keyDown react listner
@@ -964,6 +1046,7 @@ const App = (): JSX.Element => {
 					keyPressedValue={keyPressedValue}
 					keystrokesNumber={keystrokesNumber}
 					startStopState={startStopState}
+					padPanelPropsObj={padPanelProps}
 					setPadPanelProps={setPadPanelProps}
 				/>
 			</div>

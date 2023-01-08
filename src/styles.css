@@ -3,6 +3,11 @@
 	animation: fadeIn 2s ease-in-out;
 }
 
+.alertFadeIn {
+	-webkit-animation: fadeIn 0.5s ease-in-out;
+	animation: fadeIn 0.5s ease-in-out;
+}
+
 @-webkit-keyframes fadeIn {
 	0% {
 		opacity: 0;
@@ -20,6 +25,33 @@
 		opacity: 1;
 	}
 }
+
+.alertFadeIn1 {
+	-webkit-animation: fadeIn1 0.5s ease-in-out;
+	animation: fadeIn1 0.5s ease-in-out;
+}
+
+@-webkit-keyframes fadeIn1 {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+@keyframes fadeIn1 {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+.hidden {
+	opacity: 0;
+}
+
 .hoverAnimation {
 	-webkit-transition: background 1s 0s ease;
 	-moz-transition: background 1s 0s ease;
