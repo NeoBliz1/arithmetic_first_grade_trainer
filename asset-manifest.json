@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/arithmetic_trainer_1st_grade/static/css/main.d765f605.css",
+    "main.js": "/arithmetic_trainer_1st_grade/static/js/main.86a1834d.js",
+    "index.html": "/arithmetic_trainer_1st_grade/index.html",
+    "main.d765f605.css.map": "/arithmetic_trainer_1st_grade/static/css/main.d765f605.css.map",
+    "main.86a1834d.js.map": "/arithmetic_trainer_1st_grade/static/js/main.86a1834d.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.d765f605.css",
+    "static/js/main.86a1834d.js"
+  ]
+}

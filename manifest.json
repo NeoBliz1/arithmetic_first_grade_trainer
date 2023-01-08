@@ -1,0 +1,8 @@
+{
+	"short_name": "arithmetic trainer",
+	"name": "arithmetic trainer 1st grade",
+	"start_url": ".",
+	"display": "standalone",
+	"theme_color": "#000000",
+	"background_color": "#ffffff"
+}
