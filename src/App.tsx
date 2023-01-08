@@ -452,13 +452,20 @@ const EquationTrainer = (props: equationTrainerPropType): JSX.Element => {
 				//create new equation
 				const maxDigit = equationPropsObj.maxEquationDigit;
 				const minDigit = equationPropsObj.minEquationDigit;
-				setRandomFirstDigit(
-					Math.floor(Math.random() * (maxDigit - minDigit + 1)) + minDigit,
-				);
-				setRandomSecondDigit(
-					Math.floor(Math.random() * (maxDigit - minDigit + 1)) + minDigit,
-				);
-				setRandomArithmeticOperator(randomArithmeticOperatorGeneretor());
+				const firstDigit =
+					Math.floor(Math.random() * (maxDigit - minDigit + 1)) + minDigit;
+				const secondDigit =
+					Math.floor(Math.random() * (maxDigit - minDigit + 1)) + minDigit;
+				const randomOperator = randomArithmeticOperatorGeneretor();
+				if (firstDigit > secondDigit || randomOperator === '+') {
+					setRandomFirstDigit(firstDigit);
+					setRandomSecondDigit(secondDigit);
+				} else {
+					setRandomFirstDigit(secondDigit);
+					setRandomSecondDigit(firstDigit);
+				}
+
+				setRandomArithmeticOperator(randomOperator);
 			}, 1000);
 
 			return () => clearTimeout(timer);
@@ -837,7 +844,7 @@ const ButtonsPanel = (props: buttonsPanelPropType): JSX.Element => {
 					{padPanelPropsObj.prevEquiations.map((el, i) => {
 						return (
 							<h3 key={i + 1}>
-								Пример {' ' + i + ': '}{' '}
+								Пример {' ' + (i + 1) + ': '}{' '}
 								<span
 									style={{
 										backgroundColor:
