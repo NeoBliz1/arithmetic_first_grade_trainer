@@ -2,7 +2,7 @@
   "name": "arithmetic_trainer_1st_grade",
   "version": "1.0.0",
   "description": "#freeCodeCamp",
-  "homepage": "https://neobliz1.github.io/arithmetic_trainer_1st_grade/",
+  "homepage": "https://neobliz1.github.io/arithmetic_first_grade_trainer/",
   "keywords": [],
   "main": "src/index.tsx",
   "dependencies": {
