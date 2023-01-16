@@ -3,6 +3,11 @@
 	animation: fadeIn 2s ease-in-out;
 }
 
+.alertFadeIn {
+	-webkit-animation: fadeIn 0.5s ease-in-out;
+	animation: fadeIn 0.5s ease-in-out;
+}
+
 @-webkit-keyframes fadeIn {
 	0% {
 		opacity: 0;
@@ -20,7 +25,34 @@
 		opacity: 1;
 	}
 }
-.hoverAnimationDuration {
+
+.alertFadeIn1 {
+	-webkit-animation: fadeIn1 0.5s ease-in-out;
+	animation: fadeIn1 0.5s ease-in-out;
+}
+
+@-webkit-keyframes fadeIn1 {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+@keyframes fadeIn1 {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+.hidden {
+	opacity: 0;
+}
+
+.hoverAnimation {
 	-webkit-transition: background 1s 0s ease;
 	-moz-transition: background 1s 0s ease;
 	-o-transition: background 1s 0s ease;
@@ -54,20 +86,55 @@
 	line-height: 0;
 	height: min-content;
 }
-.buttonDisableStyle {
-	color: #7a7a7a;
-	background-color: #e6e6e6;
-	padding: 0;
-	margin: 0.3rem;
-	cursor: not-allowed !important;
+.padStyle {
+	background-color: #007bff;
+	border: none;
+	box-shadow: 6px 3px 2px gray;
+	font-family: 'Share Tech Mono', monospace;
+	height: 90px;
+	width: 100%;
 }
-
+#del.padStyleActive {
+	background-color: #ff0000;
+}
+.padStyleInactive {
+	background-color: #ccc;
+}
+.padStyleInactive:is(:active, :hover, :focus) {
+	background-color: #ccc !important;
+	border-color: var#ccc !important;
+}
+.padStyleActive {
+	background-color: #007bff;
+	border-color: #007bff;
+}
+.padStylePressed {
+	color: black;
+	background-color: yellow;
+	box-shadow: none;
+}
+.padStylePressed:is(:active, :hover, :focus),
+.padStyleActive:active {
+	color: black;
+	background-color: yellow;
+	border-color: yellow;
+}
+.checkButton {
+	background-color: transparent;
+	border-radius: 50%;
+	border: none;
+	display: inline-block;
+	cursor: pointer;
+	color: #000000;
+	padding: 0.3rem;
+	text-decoration: none;
+	line-height: 0;
+	height: min-content;
+}
 .timerButton:focus,
-.controlButton:focus {
+.controlButton:focus,
+.hoverAnimation:hover {
 	outline: none !important;
-}
-
-.controlButton:hover {
 	background-color: white;
 }
 
@@ -112,7 +179,7 @@
 
 .slider:before {
 	position: absolute;
-	content: "";
+	content: '';
 	height: 16px;
 	width: 16px;
 	left: 4px;
@@ -145,8 +212,8 @@ input:checked + .slider:before {
 	border-radius: 50%;
 }
 
-@media screen and (max-width: 43rem) {
+/* @media screen and (max-width: 43rem) {
 	#app {
 		transform: scale(0.8);
 	}
-}
+} */
